@@ -114,9 +114,14 @@
 #define xstr(a) str(a)
 #define str(a) #a
 
+/* Uncomment to disable uboot shell timeout */
+#define CONFIG_BOOT_RETRY_TIME -1
+
 #if defined(CONFIG_SECURE_BOOT) && defined(CONFIG_SPL)
 #define CONFIG_RESET_TO_RETRY
+#ifndef CONFIG_BOOT_RETRY_TIME
 #define CONFIG_BOOT_RETRY_TIME 100
+#endif
 #endif
 
 #define ZIMAGE_SECURE "/boot/zImage-ivt_signed"
@@ -185,6 +190,7 @@
 
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
+	"bootretry="xstr(CONFIG_BOOT_RETRY_TIME)"\0" \
 	"zimage=" ZIMAGE "\0" \
 	"fdt_addr=0x11000000\0" \
 	"ip_dyn=try\0" \
