@@ -297,10 +297,8 @@
 
 #define CONFIG_PWM_IMX
 #define CONFIG_IMX6_PWM_PER_CLK	66000000
-#define CONFIG_SYS_I2C_MXC_I2C1
-#define CONFIG_SYS_I2C_MXC_I2C2
-#define CONFIG_SYS_I2C_MXC_I2C3
-/*#define CONFIG_SYS_I2C_MXC_I2C4*/
+
+
 
 #define CMD_CRC32
 
@@ -312,9 +310,11 @@
 */
 
 /* I2C Configs */
-#define CONFIG_SYS_I2C
 #define CONFIG_SYS_I2C_MXC
 #define CONFIG_SYS_I2C_SPEED		  100000
+#define CONFIG_SYS_I2C_MXC_I2C1
+#define CONFIG_SYS_I2C_MXC_I2C2
+#define CONFIG_SYS_I2C_MXC_I2C3
 
 /* Framebuffer */
 #define CONFIG_VIDEO_IPUV3
