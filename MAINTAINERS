@@ -1,0 +1,6 @@
+VDT6010 BOARD
+M:	Mikko Salomäki <ms@datarespons.se>
+S:	Maintained
+F:	board/datarespons/vdt6010
+F:	include/configs/vdt6010.h
+F:	configs/vdt6010_defconfig
