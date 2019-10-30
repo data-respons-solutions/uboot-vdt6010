@@ -13,6 +13,14 @@
 #define DEBUG
 #endif
 */
+
+/* Fix SPL build issues with SPI DM enabled as of 2019.01 */
+#if defined(CONFIG_SPL_BUILD)
+#undef CONFIG_DM_SPI
+#undef CONFIG_DM_SPI_FLASH
+#undef CONFIG_SPI_FLASH_MTD
+#endif
+
 #define CONFIG_SYS_FSL_SEC_COMPAT 4
 
 #ifdef CONFIG_SPL
@@ -23,8 +31,6 @@
 #endif
 
 /* SPI flash */
-#define CONFIG_SPI_FLASH_WINBOND
-#define CONFIG_MXC_SPI
 #define CONFIG_SF_DEFAULT_BUS		1
 #define CONFIG_SF_DEFAULT_CS		0
 #define CONFIG_SF_DEFAULT_SPEED		20000000
