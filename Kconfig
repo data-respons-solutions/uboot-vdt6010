@@ -28,3 +28,5 @@ config BOOT_USB_INITRD
 	default n
 
 endif
+
+source "board/datarespons/common/Kconfig"
