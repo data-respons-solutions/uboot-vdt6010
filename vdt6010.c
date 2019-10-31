@@ -34,6 +34,8 @@
 #include <pwm.h>
 #include <version.h>
 #include <watchdog.h>
+#include <power/pmic.h>
+#include <power/pfuze100_pmic.h>
 
 #include <asm/mach-imx/hab.h>
 #include <vsprintf.h>
@@ -41,7 +43,7 @@
 DECLARE_GLOBAL_DATA_PTR;
 
 #include "../common/mx6_common_defs.h"
-#include "../common/dev/pfuze100.h"
+#include "../common/nvram/nvram.h"
 #include "vdt6010_pins.h"
 #include "vdt6010_gpio.h"
 
@@ -245,7 +247,7 @@ int checkboard(void)
 	printf("Vendor: %s\n", VENDOR);
 	printf("Board: %s\n", BOARD);
 	printf("HW version: %s\n", hw_string[get_version()]);
-
+	printf("NVRAM_TEST: %d\n", test_nvram());
 	return 0;
 }
 
@@ -283,39 +285,73 @@ int board_init(void)
  * power_init_board
  *
  */
-
-struct _pmic_setup {
-	pf100_regs	reg;
-	int			mV;
-} pmic_setup[] = {
-		{SW1AB, 1425},	// VDDCORE
-		{SW1C, 1425},	// VDDSOC
-		{SW3AB, 1350},	// DDR_1V5
-		{0, 0}
-};
-
 int power_init_board(void)
 {
-	const int i2c = POWER_PFUZE100_I2C;
-	const int addr = CONFIG_POWER_PFUZE100_I2C_ADDR;
-	int ret = 0;
+	return 0;
+	struct udevice *dev = NULL;
+	int r = 0;
+	int dev_id = 0;
+	int rev_id = 0;
 
-	ret = pfuze100_setup(i2c, addr);
-	if (ret) {
-		printf("%s: no pmic: i2c: %d: addr: %d\n", __func__, i2c, addr);
-		return ret;
+	r = pmic_get("pfuze100", &dev);
+	if (r) {
+		printf("pmic: pfuze100: not found [%d]: %s\n", -r, errno_str(-r));
+		return r;
 	}
 
-	for (int i = 0; pmic_setup[i].reg; ++i) {
-		printf("Setting PMIC register %s to %d mV\n", pf100_reg_str(pmic_setup[i].reg), pmic_setup[i].mV);
-		ret = pfuze100_set(i2c, addr, pmic_setup[i].reg, pmic_setup[i].mV);
-		if (ret) {
-			printf("%s: pfuze100_set: %d\n", __func__, ret);
-			return ret;
-		}
+	dev_id = pmic_reg_read(dev, PFUZE100_DEVICEID);
+	if (dev_id) {
+		printf("pmic: pfuze100: dev_id [%d]: %s\n", -dev_id, errno_str(-dev_id));
+		return dev_id;
+	}
+	rev_id = pmic_reg_read(dev, PFUZE100_REVID);
+	if (dev_id) {
+		printf("pmic: pfuze100: rev_id [%d]: %s\n", -rev_id, errno_str(-rev_id));
+		return rev_id;
+	}
+	printf("pmic: pfuze100: dev_id: 0x%04x: rev_id: 0x%04x\n", dev_id, rev_id);
+
+	/* VDDCORE to 1425 mV */
+	r = pmic_reg_write(dev, PFUZE100_SW1ABVOL, SW1x_1_425V);
+	if (!r) {
+		printf("pmic: pfuze100: SW1ABVOL: 1425 mV\n");
+	}
+	else {
+		printf("pmic: pfuze100: SW1ABVOL [%d]: %s\n", -r, errno_str(-r));
+		return r;
 	}
 
-	udelay(10000);
+	/* VDDSOC to 1425 mV */
+	r = pmic_reg_write(dev, PFUZE100_SW1CVOL, SW1x_1_425V);
+	if (!r) {
+		printf("pmic: pfuze100: SW1CVOL: 1425 mV\n");
+	}
+	else {
+		printf("pmic: pfuze100: SW1CVOL [%d]: %s\n", -r, errno_str(-r));
+		return r;
+	}
+
+	/* DDR to 1350 mV */
+	r = pmic_reg_write(dev, PFUZE100_SW3AVOL, SW1x_1_350V);
+	if (!r) {
+		printf("pmic: pfuze100: SW3AVOL: 1350 mV\n");
+	}
+	else {
+		printf("pmic: pfuze100: SW3AVOL [%d]: %s\n", -r, errno_str(-r));
+		return r;
+	}
+	r = pmic_reg_write(dev, PFUZE100_SW3BVOL, SW1x_1_350V);
+	if (!r) {
+		printf("pmic: pfuze100: SW3BVOL: 1350 mV\n");
+
+	}
+	else {
+		printf("pmic: pfuze100: SW3BVOL [%d]: %s\n", -r, errno_str(-r));
+		return r;
+	}
+
+	/* delay needed? */
+	mdelay(10);
 
 	return 0;
 }
