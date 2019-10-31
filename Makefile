@@ -10,5 +10,4 @@ ifdef CONFIG_SPL_BUILD
 obj-y += spl.o
 else
 obj-y += vdt6010.o
-obj-y += ../common/dev/pfuze100.o
 endif
