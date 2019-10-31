@@ -208,10 +208,6 @@ int board_early_init_f(void)
 	gpio_direction_output(LED_EN, 0);
 	gpio_direction_output(LCD_VDD_EN, 0);
 
-	setup_i2c(0, CONFIG_SYS_I2C_SPEED, 0x7f, &mx6dq_i2c_pad_info0);
-	setup_i2c(1, CONFIG_SYS_I2C_SPEED, 0x7f, &mx6dq_i2c_pad_info1);
-	setup_i2c(2, CONFIG_SYS_I2C_SPEED, 0x7f, &mx6dq_i2c_pad_info2);
-
 	setup_display();
 
 	return 0;
@@ -285,9 +281,9 @@ int board_init(void)
  * power_init_board
  *
  */
+
 int power_init_board(void)
 {
-	return 0;
 	struct udevice *dev = NULL;
 	int r = 0;
 	int dev_id = 0;
@@ -300,12 +296,12 @@ int power_init_board(void)
 	}
 
 	dev_id = pmic_reg_read(dev, PFUZE100_DEVICEID);
-	if (dev_id) {
+	if (dev_id < 0) {
 		printf("pmic: pfuze100: dev_id [%d]: %s\n", -dev_id, errno_str(-dev_id));
 		return dev_id;
 	}
 	rev_id = pmic_reg_read(dev, PFUZE100_REVID);
-	if (dev_id) {
+	if (dev_id < 0) {
 		printf("pmic: pfuze100: rev_id [%d]: %s\n", -rev_id, errno_str(-rev_id));
 		return rev_id;
 	}
@@ -355,7 +351,6 @@ int power_init_board(void)
 
 	return 0;
 }
-
 
 /*
  *
