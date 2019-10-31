@@ -248,12 +248,12 @@ void board_init_f(ulong dummy)
 	arch_cpu_init();
 	ccgr_init();
 	gpr_init();
-
+/*
 #ifdef CONFIG_SPL_WATCHDOG_SUPPORT
 	void hw_watchdog_init(void);
 	hw_watchdog_init();
 #endif
-
+*/
 	board_early_init_f();
 
 	// setup GP timer
