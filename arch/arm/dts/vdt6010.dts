@@ -23,7 +23,11 @@
 / {
     model = "Data Respons Solutions VDT6010 (rev A - dual/quad)";
     compatible = "fsl,imx6q";
-
+	
+	chosen {
+		stdout-path = &uart5;
+	};
+	
 	aliases {
 		mxcfb0 = &mxcfb1;
 		mxcfb1 = &mxcfb2;
