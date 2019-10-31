@@ -30,12 +30,6 @@
 #define CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR 512
 #endif
 
-/* SPI flash */
-#define CONFIG_SF_DEFAULT_BUS		1
-#define CONFIG_SF_DEFAULT_CS		0
-#define CONFIG_SF_DEFAULT_SPEED		20000000
-#define CONFIG_SF_DEFAULT_MODE		SPI_MODE_0
-
 /* Flash and environment organization
  *
  * Flash with 64k sector erase
