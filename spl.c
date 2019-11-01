@@ -9,46 +9,19 @@
 #include <asm/arch/clock.h>
 #include <asm/arch/imx-regs.h>
 #include <asm/mach-imx/spi.h>
-#include <linux/errno.h>
 #include <asm/mach-imx/boot_mode.h>
-#include <asm/mach-imx/video.h>
-#include <mmc.h>
-#include <fsl_esdhc.h>
-#include <miiphy.h>
-#include <netdev.h>
-#include <asm/arch/mxc_hdmi.h>
 #include <asm/arch/crm_regs.h>
 #include <asm/io.h>
 #include <asm/arch/sys_proto.h>
-#include <input.h>
-#include <usb.h>
-#include <usb/ehci-ci.h>
-#include <environment.h>
-#include <usb.h>
-#include <pwm.h>
 #include <version.h>
 #include <watchdog.h>
 #include <asm/arch/mx6-ddr.h>
 #include <spl.h>
 #include <asm/mach-imx/hab.h>
-//#include <vsprintf.h>
-
-DECLARE_GLOBAL_DATA_PTR;
-
-#include "../common/mx6_common_defs.h"
 #include "vdt6010_pins.h"
 #include "vdt6010_gpio.h"
 
-
-struct fsl_esdhc_cfg usdhc_cfg[1] = {
-	{USDHC2_BASE_ADDR},
-	{USDHC4_BASE_ADDR},
-};
-
-static int get_version(void)
-{
-	return 0;
-}
+DECLARE_GLOBAL_DATA_PTR;
 
 int board_spi_cs_gpio(unsigned bus, unsigned cs)
 {
@@ -57,56 +30,6 @@ int board_spi_cs_gpio(unsigned bus, unsigned cs)
 	}
 
 	return -1;
-}
-
-int board_mmc_getcd(struct mmc *mmc)
-{
-	struct fsl_esdhc_cfg *cfg = (struct fsl_esdhc_cfg *)mmc->priv;
-	int ret = 0;
-
-	switch (cfg->esdhc_base) {
-	case USDHC2_BASE_ADDR:
-		ret = !gpio_get_value(USDHC2_CD);
-		break;
-
-	case USDHC4_BASE_ADDR:
-		ret = 1;
-		break;
-	}
-
-	return ret;
-}
-
-int board_mmc_init(bd_t *bis)
-{
-	struct src *psrc = (struct src *)SRC_BASE_ADDR;
-	unsigned reg = readl(&psrc->sbmr1) >> 11;
-	/*
-	 * Upon reading BOOT_CFG register the following map is done:
-	 * Bit 11 and 12 of BOOT_CFG register can determine the current
-	 * mmc port
-	 * 0x1                  SD1
-	 * 0x2                  SD2
-	 * 0x3                  SD4
-	 */
-
-	switch (reg & 0x3) {
-	case 0x1:
-		SETUP_IOMUX_PADS(usdhc2_pads);
-		gpio_direction_input(USDHC2_CD);
-		usdhc_cfg[0].esdhc_base = USDHC2_BASE_ADDR;
-		usdhc_cfg[0].sdhc_clk = mxc_get_clock(MXC_ESDHC2_CLK);
-		gd->arch.sdhc_clk = usdhc_cfg[0].sdhc_clk;
-		break;
-	case 0x3:
-		SETUP_IOMUX_PADS(usdhc4_pads);
-		usdhc_cfg[0].esdhc_base = USDHC4_BASE_ADDR;
-		usdhc_cfg[0].sdhc_clk = mxc_get_clock(MXC_ESDHC4_CLK);
-		gd->arch.sdhc_clk = usdhc_cfg[0].sdhc_clk;
-		break;
-	}
-
-	return fsl_esdhc_initialize(bis, &usdhc_cfg[0]);
 }
 
 #define MX6DQ_DDR_TYPE_DD3 0x000C0000
