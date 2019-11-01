@@ -358,7 +358,6 @@ int power_init_board(void)
  *
  */
 
-
 struct fsl_esdhc_cfg usdhc_cfg[2] = {
 	{USDHC2_BASE_ADDR},
 	{USDHC4_BASE_ADDR},
@@ -404,101 +403,12 @@ int board_mmc_init(bd_t *bis)
 	return 0;
 }
 
-/*
- *
- * board_late_init
- *
- */
-
-#define USBNC_USB_OTG_CTRL 		(USB_BASE_ADDR + 0x800)
-#define USBNC_CTRL_OVER_CUR_POL	(1 << 8) // Polarity of OC pin
-#define USBNC_CTRL_PWR_POL		(1 << 9) // Polarity of pwr pin
-
-//FIXME:
-int board_ehci_hcd_init(int port)
-{
-	u32 *usbnc_usb_ctrl;
-
-	if (port > 1) {
-		return -EINVAL;
-	}
-
-	usbnc_usb_ctrl = (u32 *)(USBNC_USB_OTG_CTRL + port * 4);
-	// FIXME: POWER ANC OC POLARITY?
-	setbits_le32(usbnc_usb_ctrl, USBNC_CTRL_PWR_POL | USBNC_CTRL_OVER_CUR_POL);
-
-	return 0;
-}
-/*
-int board_usb_phy_mode(int port)
-{
-	unsigned int bmode = readl(&src_base->sbmr2);
-
-	switch(port) {
-	case 0:
-		if (((bmode >> 24) & 0x03) == 0x01)	{
-			printf("USB OTG in serial download mode\n");
-			return USB_INIT_DEVICE;
-		}
-
-		return USB_INIT_HOST;
-
-	case 1:
-		return USB_INIT_HOST;
-
-	default:
-		return USB_INIT_DEVICE;
-	}
-}
-*/
-
 static void setup_usb(void)
 {
-	SETUP_IOMUX_PADS(usb_otg_pads);
-	SETUP_IOMUX_PADS(usb_host_pads);
-
 	// Set daisy chain - USB_OTG_ID to GPIO_1
 	if (is_mx6dq()) {
 		imx_iomux_set_gpr_register(1, IOMUXC_GPR1_USB_OTG_ID_OFFSET, 1, 1);
 	}
-
-	// Reset USB hub and devices
-	gpio_direction_output(USB_HUB_RST, 0);
-	gpio_direction_output(USB_PWR_EN1, 0);
-	gpio_direction_output(USB_PWR_EN2, 0);
-	mdelay(10);
-	gpio_set_value(USB_HUB_RST, 1);
-	gpio_set_value(USB_PWR_EN1, 1);
-	gpio_set_value(USB_PWR_EN2, 1);
-}
-
-/**
- * board_ehci_power - enables/disables usb vbus voltage
- * @port:      usb otg port
- * @on:        on/off vbus voltage
- *
- * Enables/disables supply vbus voltage for usb otg port.
- * Machine board file overrides board_ehci_power
- *
- * Return: 0 Success
- */
-int board_ehci_power(int port, int on)
-{
-	switch (port) {
-	case 0:
-		break;
-	case 1:
-		if (on)
-			gpio_direction_output(IMX_GPIO_NR(1, 29), 1);
-		else
-			gpio_direction_output(IMX_GPIO_NR(1, 29), 0);
-		break;
-	default:
-		printf("MXC USB port %d not yet supported\n", port);
-		return -EINVAL;
-	}
-
-	return 0;
 }
 
 static char * const usbcmd[] = {"usb", "start"};

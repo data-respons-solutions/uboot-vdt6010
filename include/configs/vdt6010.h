@@ -306,9 +306,11 @@
 #define CONFIG_IMX_VIDEO_SKIP
 
 /* USB */
+#if defined(CONFIG_USB)
 #define CONFIG_EHCI_HCD_INIT_AFTER_RESET
 #define CONFIG_MXC_USB_PORTSC		(PORT_PTS_UTMI | PORT_PTS_PTW)
 #define CONFIG_USB_MAX_CONTROLLER_COUNT	2 /* Enabled USB controller number */
-#define CONFIG_USBD_HS
+/*#define CONFIG_USBD_HS*/
+#endif
 
 #endif /* __VDT6010_CONFIG_H */
