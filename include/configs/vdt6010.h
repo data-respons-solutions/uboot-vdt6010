@@ -8,27 +8,42 @@
 
 #ifndef __VDT6010_CONFIG_H
 #define __VDT6010_CONFIG_H
-/*
-#ifndef CONFIG_SPL_BUILD
+
+#define xstr(a) str(a)
+#define str(a) #a
+
+/* Debug for SPL */
+#if 0
+#ifdef CONFIG_SPL_BUILD
 #define DEBUG
 #endif
-*/
+#endif
 
-/* Fix SPL build issues with SPI DM enabled as of 2019.01 */
+/* Debug for UBOOT */
+#if 0
+#ifndef CONFIG_SPL_BUILD
+#define DEBUG
+#define CONFIG_BOOT_RETRY_TIME -1 /* disable shell timeout */
+#endif
+#endif
+
+#if defined(CONFIG_SPL)
+#include "imx6_spl.h"
+#endif
+
 #if defined(CONFIG_SPL_BUILD)
+/* Fix SPL build issues with SPI DM enabled as of 2019.01
+ *   -- Keep until SPL migrates to FDT */
 #undef CONFIG_DM_SPI
 #undef CONFIG_DM_SPI_FLASH
 #undef CONFIG_SPI_FLASH_MTD
+
+/* offset of u-boot binary on SPI NOR */
+#define CONFIG_SYS_SPI_U_BOOT_OFFS	0x30000
 #endif
 
+/* Secure boot */
 #define CONFIG_SYS_FSL_SEC_COMPAT 4
-
-#ifdef CONFIG_SPL
-
-#include "imx6_spl.h"
-#undef CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR
-#define CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR 512
-#endif
 
 /* Flash and environment organization
  *
@@ -41,31 +56,11 @@
  * 0x100000	~	0x110000	- factory (64kb)
  * 0x110000	~	0x400000	- user (3008kb)
  */
-
-#define CONFIG_SYS_SPI_U_BOOT_OFFS	0x30000
-#define CONFIG_ENV_SIZE				0x10000
-/* env integrated in u-boot */
-/*
-#define CONFIG_ENV_OVERWRITE
-#define CONFIG_ENV_OFFSET			0xF0000
-#define CONFIG_ENV_SECT_SIZE		0x10000
-*/
-
-#define CONFIG_MXC_UART_BASE	UART5_BASE
-#define CONSOLE_DEV		"ttymxc4"
-#define CONFIG_IMX_WATCHDOG
-
-#define CONFIG_MMCROOT			"/dev/mmcblk0p1"
-
-/* This defines always booting from eMMC, rework mmc code
- * to support booting from usb -> sd -> mmc?
- */
-#define MMC_DEV "1"
+#define CONFIG_ENV_SIZE			0x10000
 
 #define CONFIG_SUPPORT_EMMC_BOOT /* eMMC specific */
 
 #include "mx6_common.h"
-
 
 #define CONFIG_CMDLINE_TAG
 #define CONFIG_SETUP_MEMORY_TAGS
@@ -73,7 +68,6 @@
 #define CONFIG_REVISION_TAG
 
 #define CONFIG_IMX_THERMAL
-
 
 /* Size of malloc() pool */
 #define CONFIG_SYS_MALLOC_LEN		(40 * SZ_1M)
@@ -89,33 +83,33 @@
 #define CONFIG_FSL_USDHC
 #define CONFIG_SYS_FSL_ESDHC_ADDR   USDHC4_BASE_ADDR
 
+/* ethernet */
 #define CONFIG_FEC_MXC
 #define CONFIG_MII
 #define IMX_FEC_BASE			ENET_BASE_ADDR
 #define CONFIG_FEC_XCV_TYPE		RMII
 #define CONFIG_ETHPRIME			"FEC"
 #define CONFIG_FEC_MXC_PHYADDR		0
-/*#define CONFIG_CMD_NET*/
 #define CONFIG_PHYLIB
 #define CONFIG_PHY_SMSC
 
-/* allow to overwrite serial and ethaddr */
-#define CONFIG_CONS_INDEX              1
-#define CONFIG_BAUDRATE                        115200
-
-#ifndef CONFIG_LOGLEVEL
-#define CONFIG_LOGLEVEL 4
-#endif
+/* Serial console */
+#define CONFIG_MXC_UART_BASE	UART5_BASE
+#define CONFIG_BAUDRATE			115200
 
 #define CONFIG_LOADADDR                0x12000000
 
+/* linux parameters */
 #define CONFIG_MACH_TYPE	0xffffffff	/* Needed for newer kernels */
-
-#define xstr(a) str(a)
-#define str(a) #a
-
-/* Uncomment to disable uboot shell timeout */
-#define CONFIG_BOOT_RETRY_TIME -1
+#ifndef CONFIG_LOGLEVEL
+#define CONFIG_LOGLEVEL 4
+#endif
+#define CONSOLE_DEV		"ttymxc4"
+/* This defines always booting from eMMC, rework mmc code
+ * to support booting from usb -> sd -> mmc?
+ */
+#define MMC_DEV "1"
+#define CONFIG_MMCROOT			"/dev/mmcblk0p1"
 
 #if defined(CONFIG_SECURE_BOOT) && defined(CONFIG_SPL)
 #define CONFIG_RESET_TO_RETRY
@@ -258,15 +252,9 @@
 	"run bootscript;"
 #endif
 
-#define CONFIG_ARP_TIMEOUT     200UL
-
 /* Miscellaneous configurable options */
 #define CONFIG_SYS_PROMPT_HUSH_PS2     "> "
 #define CONFIG_SYS_BARGSIZE CONFIG_SYS_CBSIZE
-
-#define CONFIG_SYS_MEMTEST_START       0x10000000
-#define CONFIG_SYS_MEMTEST_END         0x10010000
-#define CONFIG_SYS_MEMTEST_SCRATCH     0x10800000
 
 #define CONFIG_SYS_LOAD_ADDR           CONFIG_LOADADDR
 
@@ -291,10 +279,6 @@
 
 #define CONFIG_PWM_IMX
 #define CONFIG_IMX6_PWM_PER_CLK	66000000
-
-
-
-#define CMD_CRC32
 
 /* PCIe configs */
 /*
@@ -321,16 +305,7 @@
 #define CONFIG_IMX_HDMI
 #define CONFIG_IMX_VIDEO_SKIP
 
-/* PMIC */
-/*
-#define CONFIG_POWER
-#define CONFIG_POWER_I2C
-#define CONFIG_POWER_PFUZE100
-*/
-/*
-#define CONFIG_POWER_PFUZE100_I2C_ADDR	0x08
-#define POWER_PFUZE100_I2C 1
-*/
+/* USB */
 #define CONFIG_EHCI_HCD_INIT_AFTER_RESET
 #define CONFIG_MXC_USB_PORTSC		(PORT_PTS_UTMI | PORT_PTS_PTW)
 #define CONFIG_USB_MAX_CONTROLLER_COUNT	2 /* Enabled USB controller number */
