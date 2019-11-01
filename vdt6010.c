@@ -352,57 +352,6 @@ int power_init_board(void)
 	return 0;
 }
 
-/*
- *
- * mmc
- *
- */
-
-struct fsl_esdhc_cfg usdhc_cfg[2] = {
-	{USDHC2_BASE_ADDR},
-	{USDHC4_BASE_ADDR},
-};
-
-int board_mmc_getcd(struct mmc *mmc)
-{
-	struct fsl_esdhc_cfg *cfg = (struct fsl_esdhc_cfg *)mmc->priv;
-	int ret = 0;
-
-	switch (cfg->esdhc_base) {
-	case USDHC2_BASE_ADDR:
-		ret = !gpio_get_value(USDHC2_CD);
-		break;
-
-	case USDHC4_BASE_ADDR:
-		ret = 1;
-		break;
-	}
-
-	return ret;
-}
-
-int board_mmc_init(bd_t *bis)
-{
-	int ret;
-
-	SETUP_IOMUX_PADS(usdhc2_pads);
-	gpio_direction_input(USDHC2_CD);
-	usdhc_cfg[0].sdhc_clk = mxc_get_clock(MXC_ESDHC2_CLK);
-	ret = fsl_esdhc_initialize(bis, &usdhc_cfg[0]);
-	if (ret) {
-		return ret;
-	}
-
-	SETUP_IOMUX_PADS(usdhc4_pads);
-	usdhc_cfg[1].sdhc_clk = mxc_get_clock(MXC_ESDHC4_CLK);
-	ret = fsl_esdhc_initialize(bis, &usdhc_cfg[1]);
-	if (ret) {
-		return ret;
-	}
-
-	return 0;
-}
-
 static void setup_usb(void)
 {
 	// Set daisy chain - USB_OTG_ID to GPIO_1
