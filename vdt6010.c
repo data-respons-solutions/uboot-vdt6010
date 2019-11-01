@@ -36,6 +36,8 @@
 #include <watchdog.h>
 #include <power/pmic.h>
 #include <power/pfuze100_pmic.h>
+#include <dm.h>
+#include <power/regulator.h>
 
 #include <asm/mach-imx/hab.h>
 #include <vsprintf.h>
@@ -56,12 +58,31 @@ DECLARE_GLOBAL_DATA_PTR;
  *
  */
 
+static int enable_regulator(const char* name)
+{
+	struct udevice* reg = NULL;
+
+	int r = regulator_get_by_platname(name, &reg);
+	if (r) {
+		printf("%s: failed finding: %s [%d]: %s\n", __func__, name, -r, errno_str(-r));
+		return r;
+	}
+
+	r = regulator_set_enable(reg, 1);
+	if (r) {
+		printf("%s: failed enabling: %s [%d]: %s\n", __func__, name, -r, errno_str(-r));
+		return r;
+	}
+
+	return 0;
+}
+
 static void setup_backlight()
 {
 	SETUP_IOMUX_PADS(pwm_pads);
 
-	gpio_set_value(LED_VCC_EN, 1);
-	gpio_set_value(LED_EN, 1);
+	enable_regulator("lcd_backlight");
+	enable_regulator("lcd_vdd");
 
 	if (pwm_config(0, BACKLIGHT_PERIOD_NS, BACKLIGHT_PERIOD_NS)) {
 		printf("%s: pwm_config failed\n", __func__);
@@ -204,9 +225,7 @@ int board_early_init_f(void)
 	SETUP_IOMUX_PADS(gpio_pads);
 	SETUP_IOMUX_PADS(other_pads);
 
-	gpio_direction_output(LED_VCC_EN, 0);
 	gpio_direction_output(LED_EN, 0);
-	gpio_direction_output(LCD_VDD_EN, 0);
 
 	setup_display();
 

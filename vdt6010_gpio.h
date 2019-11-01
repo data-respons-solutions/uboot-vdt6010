@@ -22,19 +22,12 @@
 #define LAN8710_RST		IMX_GPIO_NR(6, 14)
 #define LAN8710_IRQ		IMX_GPIO_NR(1, 9)
 
-#define USB_PWR_EN1		IMX_GPIO_NR(5, 15)
-#define USB_PWR_EN2		IMX_GPIO_NR(5, 16)
-#define USB_HUB_RST		IMX_GPIO_NR(5, 17)
-
 #define PCIE_RST		IMX_GPIO_NR(4, 8)
 
 #define GPIO_MCU		IMX_GPIO_NR(1, 0)
 
-#define LED_VCC_EN		IMX_GPIO_NR(1, 5)
 #define LED_EN			IMX_GPIO_NR(7, 12)
-#define LCD_VDD_EN		IMX_GPIO_NR(1, 6)
 #define DEBUG_LED		IMX_GPIO_NR(7, 8)
 #define RTC_IRQ			IMX_GPIO_NR(1, 3)
-#define PMIC_INT		IMX_GPIO_NR(7, 13)
 
 #endif /* __VDT6010_GPIO_H__ */
