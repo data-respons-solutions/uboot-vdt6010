@@ -410,6 +410,22 @@ static void setup_usb(void)
 	}
 }
 
+static void setup_enet(void)
+{
+	/*
+	 * Set GPR1[21] to configure ENET_REF_CLK as output.
+	 * ENET_REF_CLOCK from anatop->enet_pll
+	 * Expects GPR1[13] already cleared (setup_usb()) to select ENET_RX_ER
+	 */
+	imx_iomux_set_gpr_register(1, IOMUXC_GPR1_ENET_CLK_SEL_OFFSET, 1, 1);
+
+	/* Set anatop->enet_pll as 50MHz */
+	int r = enable_fec_anatop_clock(0, ENET_50MHZ);
+	if (r) {
+		printf("%s: enable_fec_anatop_clock: %d\n", __func__, r);
+	}
+}
+
 static char * const usbcmd[] = {"usb", "start"};
 
 int board_late_init(void)
@@ -417,8 +433,8 @@ int board_late_init(void)
 	int rep;
 	ulong ticks;
 
-	//FIXME: Move setup_usb() to
 	setup_usb();
+	setup_enet();
 
 	cmd_process(0, 2, usbcmd, &rep, &ticks);
 
@@ -445,54 +461,4 @@ int board_late_init(void)
 	}
 
 	return 0;
-}
-
-/*
- *
- * enet
- *
- */
-
-int board_phy_config(struct phy_device *phydev)
-{
-	if (phydev->drv->config)
-		phydev->drv->config(phydev);
-
-	return 0;
-}
-
-static void setup_iomux_enet(void)
-{
-	int ret = 0;
-
-	SETUP_IOMUX_PADS(enet_pads);
-
-	/* Set LAN8710 PHY reset */
-	struct gpio_desc lan8710_rst;
-	request_gpio(&lan8710_rst, "GPIO6_14", "LAN8710_RST");
-	set_gpio(&lan8710_rst, "GPIO6_14", 0);
-
-	/*
-	 * Set GPR1[21] to configure ENET_REF_CLK as output.
-	 * ENET_REF_CLOCK from anatop->enet_pll
-	 * Expects GPR1[13] already cleared (setup_usb) to select ENET_RX_ER
-	 */
-	imx_iomux_set_gpr_register(1, IOMUXC_GPR1_ENET_CLK_SEL_OFFSET, 1, 1);
-
-	/* Set anatop->enet_pll as 50MHz */
-	ret = enable_fec_anatop_clock(0, ENET_50MHZ);
-	if (ret) {
-		printf("%s: enable_fec_anatop_clock: %d\n", __func__, ret);
-	}
-
-	mdelay(1);
-
-	/* Release LAN8710 PHY reset */
-	set_gpio(&lan8710_rst, "GPIO6_14", 1);
-}
-
-int board_eth_init(bd_t *bis)
-{
-	setup_iomux_enet();
-	return cpu_eth_init(bis);
 }

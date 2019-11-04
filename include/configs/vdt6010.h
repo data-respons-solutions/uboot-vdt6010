@@ -78,16 +78,6 @@
 #define CONFIG_MXC_OCOTP
 #endif
 
-/* ethernet */
-#define CONFIG_FEC_MXC
-#define CONFIG_MII
-#define IMX_FEC_BASE			ENET_BASE_ADDR
-#define CONFIG_FEC_XCV_TYPE		RMII
-#define CONFIG_ETHPRIME			"FEC"
-#define CONFIG_FEC_MXC_PHYADDR		0
-#define CONFIG_PHYLIB
-#define CONFIG_PHY_SMSC
-
 /* Serial console */
 #define CONFIG_MXC_UART_BASE	UART5_BASE
 #define CONFIG_BAUDRATE			115200
@@ -288,6 +278,11 @@
 #define CONFIG_SYS_I2C_MXC_I2C1
 #define CONFIG_SYS_I2C_MXC_I2C2
 #define CONFIG_SYS_I2C_MXC_I2C3
+
+/* ethernet */
+#define CONFIG_MII
+#define CONFIG_FEC_XCV_TYPE		RMII
+#define CONFIG_ETHPRIME			"FEC"
 
 /* Framebuffer */
 #define CONFIG_VIDEO_IPUV3

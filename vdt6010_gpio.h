@@ -19,8 +19,6 @@
 #define GPIO_7			IMX_GPIO_NR(5, 9)
 #define GPIO_8			IMX_GPIO_NR(5, 10)
 
-#define LAN8710_IRQ		IMX_GPIO_NR(1, 9)
-
 #define PCIE_RST		IMX_GPIO_NR(4, 8)
 
 #define GPIO_MCU		IMX_GPIO_NR(1, 0)
