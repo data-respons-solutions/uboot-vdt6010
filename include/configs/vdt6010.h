@@ -40,6 +40,9 @@
 
 /* offset of u-boot binary on SPI NOR */
 #define CONFIG_SYS_SPI_U_BOOT_OFFS	0x30000
+
+/* Define console UART until migrate to DM */
+#define CONFIG_MXC_UART_BASE	UART5_BASE
 #endif
 
 /* Secure boot */
@@ -72,14 +75,11 @@
 /* Size of malloc() pool */
 #define CONFIG_SYS_MALLOC_LEN		(40 * SZ_1M)
 
-#define CONFIG_MXC_UART
-
 #if defined(CONFIG_CMD_FUSE) || defined(CONFIG_IMX6_THERMAL)
 #define CONFIG_MXC_OCOTP
 #endif
 
 /* Serial console */
-#define CONFIG_MXC_UART_BASE	UART5_BASE
 #define CONFIG_BAUDRATE			115200
 
 #define CONFIG_LOADADDR                0x12000000

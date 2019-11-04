@@ -254,10 +254,6 @@ int overwrite_console(void)
 
 int board_early_init_f(void)
 {
-	SETUP_IOMUX_PADS(uart1_pads);
-	SETUP_IOMUX_PADS(gpio_pads);
-	SETUP_IOMUX_PADS(other_pads);
-
 	setup_display();
 
 	return 0;
