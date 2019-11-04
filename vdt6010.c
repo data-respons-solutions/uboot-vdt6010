@@ -38,6 +38,7 @@
 #include <power/pfuze100_pmic.h>
 #include <dm.h>
 #include <power/regulator.h>
+#include <asm/gpio.h>
 
 #include <asm/mach-imx/hab.h>
 #include <vsprintf.h>
@@ -77,18 +78,38 @@ static int enable_regulator(const char* name)
 	return 0;
 }
 
-static void setup_backlight()
+static int request_gpio(struct gpio_desc* desc, const char* name, const char* label)
 {
-	SETUP_IOMUX_PADS(pwm_pads);
-
-	enable_regulator("lcd_backlight");
-	enable_regulator("lcd_vdd");
-
-	if (pwm_config(0, BACKLIGHT_PERIOD_NS, BACKLIGHT_PERIOD_NS)) {
-		printf("%s: pwm_config failed\n", __func__);
+	int r = dm_gpio_lookup_name(name, desc);
+	if (r) {
+		printf("%s: failed finding: %s [%d]: %s\n", __func__, name, -r, errno_str(-r));
+		return r;
 	}
 
-	pwm_enable(0);
+	r = dm_gpio_request(desc, label);
+	if (r) {
+		printf("%s: failed requesting: %s [%d]: %s\n", __func__, name, -r, errno_str(-r));
+		return r;
+	}
+
+	return 0;
+}
+
+static int set_gpio(struct gpio_desc* desc, const char* name, int value)
+{
+	int r = dm_gpio_set_dir_flags(desc, GPIOD_IS_OUT);
+	if (r) {
+		printf("%s: failed setting output: %s [%d]: %s\n", __func__, name, -r, errno_str(-r));
+		return r;
+	}
+
+	r = dm_gpio_set_value(desc, value);
+	if (r) {
+		printf("%s: failed setting value: %s->%d [%d]: %s\n", __func__, name, value, -r, errno_str(-r));
+		return r;
+	}
+
+	return 0;
 }
 
 static void disable_lvds(struct display_info_t const *dev)
@@ -111,8 +132,20 @@ static void do_enable_hdmi(struct display_info_t const *dev)
 
 static void enable_lvds(struct display_info_t const *dev)
 {
-	gpio_set_value(LCD_VDD_EN, 1);
-	setup_backlight();
+	SETUP_IOMUX_PADS(pwm_pads);
+
+	enable_regulator("lcd_backlight");
+	enable_regulator("lcd_vdd");
+
+	struct gpio_desc led_en;
+	request_gpio(&led_en, "GPIO7_12", "LED_EN");
+	set_gpio(&led_en, "GPIO7_12", 1);
+
+	if (pwm_config(0, BACKLIGHT_PERIOD_NS, BACKLIGHT_PERIOD_NS)) {
+		printf("%s: pwm_config failed\n", __func__);
+	}
+
+	pwm_enable(0);
 }
 
 
@@ -224,8 +257,6 @@ int board_early_init_f(void)
 	SETUP_IOMUX_PADS(uart1_pads);
 	SETUP_IOMUX_PADS(gpio_pads);
 	SETUP_IOMUX_PADS(other_pads);
-
-	gpio_direction_output(LED_EN, 0);
 
 	setup_display();
 
@@ -437,7 +468,9 @@ static void setup_iomux_enet(void)
 	SETUP_IOMUX_PADS(enet_pads);
 
 	/* Set LAN8710 PHY reset */
-	gpio_direction_output(LAN8710_RST , 0);
+	struct gpio_desc lan8710_rst;
+	request_gpio(&lan8710_rst, "GPIO6_14", "LAN8710_RST");
+	set_gpio(&lan8710_rst, "GPIO6_14", 0);
 
 	/*
 	 * Set GPR1[21] to configure ENET_REF_CLK as output.
@@ -455,7 +488,7 @@ static void setup_iomux_enet(void)
 	mdelay(1);
 
 	/* Release LAN8710 PHY reset */
-	gpio_set_value(LAN8710_RST , 1);
+	set_gpio(&lan8710_rst, "GPIO6_14", 1);
 }
 
 int board_eth_init(bd_t *bis)
