@@ -10,10 +10,11 @@
  *
  * SPDX-License-Identifier:	GPL-2.0+
  */
+#include <errno.h>
 #include <asm/arch/clock.h>
 #include <asm/arch/imx-regs.h>
 #include <asm/mach-imx/spi.h>
-#include <linux/errno.h>
+#include <linux/kernel.h>
 #include <asm/mach-imx/mxc_i2c.h>
 #include <asm/mach-imx/boot_mode.h>
 #include <asm/mach-imx/video.h>
@@ -39,6 +40,7 @@
 #include <dm.h>
 #include <power/regulator.h>
 #include <asm/gpio.h>
+#include <linux/libfdt.h>
 
 #include <asm/mach-imx/hab.h>
 #include <vsprintf.h>
@@ -52,6 +54,9 @@ DECLARE_GLOBAL_DATA_PTR;
 
 #define BACKLIGHT_FREQ_HZ 1000
 #define BACKLIGHT_PERIOD_NS 1000000000 / BACKLIGHT_FREQ_HZ
+
+#define xstr(a) str(a)
+#define str(a) #a
 
 /*
  *
@@ -289,7 +294,6 @@ int checkboard(void)
 	printf("Vendor: %s\n", VENDOR);
 	printf("Board: %s\n", BOARD);
 	printf("HW version: %s\n", hw_string[get_version()]);
-	printf("NVRAM_TEST: %d\n", test_nvram());
 	return 0;
 }
 
@@ -312,12 +316,38 @@ int dram_init(void)
  * Setup chipselects
  *
  */
+static void setup_usb(void)
+{
+	// Set daisy chain - USB_OTG_ID to GPIO_1
+	if (is_mx6dq()) {
+		imx_iomux_set_gpr_register(1, IOMUXC_GPR1_USB_OTG_ID_OFFSET, 1, 1);
+	}
+}
 
+static void setup_enet(void)
+{
+	/*
+	 * Set GPR1[21] to configure ENET_REF_CLK as output.
+	 * ENET_REF_CLOCK from anatop->enet_pll
+	 * Expects GPR1[13] already cleared (setup_usb()) to select ENET_RX_ER
+	 */
+	imx_iomux_set_gpr_register(1, IOMUXC_GPR1_ENET_CLK_SEL_OFFSET, 1, 1);
+
+	/* Set anatop->enet_pll as 50MHz */
+	int r = enable_fec_anatop_clock(0, ENET_50MHZ);
+	if (r) {
+		printf("%s: enable_fec_anatop_clock: %d\n", __func__, r);
+	}
+}
 
 int board_init(void)
 {
 	// address of boot parameters
 	gd->bd->bi_boot_params = PHYS_SDRAM + 0x100;
+
+	setup_usb();
+	setup_enet();
+	printf("NVRAM_TEST: %d\n", test_nvram());
 
 	return 0;
 }
@@ -398,41 +428,62 @@ int power_init_board(void)
 	return 0;
 }
 
-static void setup_usb(void)
+static void select_fdt(void)
 {
-	// Set daisy chain - USB_OTG_ID to GPIO_1
-	if (is_mx6dq()) {
-		imx_iomux_set_gpr_register(1, IOMUXC_GPR1_USB_OTG_ID_OFFSET, 1, 1);
+	void* fdt_addr = (void*) env_get_hex("fdt_addr", 0);
+	int r = 0;
+
+	if (!fdt_addr) {
+		printf("%s: env \"fdt_addr\" not defined -- ignore fdt\n", __func__);
+		return;
 	}
+
+	r = fdt_check_header(fdt_addr);
+	if (!r) {
+		printf("%s: valid fdt found in fdt_addr 0x%p\n", __func__, fdt_addr);
+		return;
+	}
+#if 0
+/*
+ * Linux wasn't able to boot with devicetree from uboot.
+ */
+#if defined(CONFIG_OF_CONTROL)
+	if (gd->fdt_blob) {
+		r = fdt_check_header(gd->fdt_blob);
+		if (!r) {
+			printf("%s: valid fdt found in uboot 0x%p -- copy to fdt_addr 0x%p\n", __func__, gd->fdt_blob, fdt_addr);
+			ulong fdt_high = env_get_hex("fdt_high", ULONG_MAX);
+			r = fdt_move(gd->fdt_blob, fdt_addr, fdt_high - (ulong) fdt_addr);
+			if (r) {
+				printf("%s: fdt_move [%d]: %s\n", __func__, r, fdt_strerror(r));
+			}
+			else {
+				return;
+			}
+		}
+	}
+#endif
+#endif
+	printf("%s: no fdt found in platform\n", __func__);
 }
 
-static void setup_enet(void)
+static int start_usb(void)
 {
-	/*
-	 * Set GPR1[21] to configure ENET_REF_CLK as output.
-	 * ENET_REF_CLOCK from anatop->enet_pll
-	 * Expects GPR1[13] already cleared (setup_usb()) to select ENET_RX_ER
-	 */
-	imx_iomux_set_gpr_register(1, IOMUXC_GPR1_ENET_CLK_SEL_OFFSET, 1, 1);
+	unsigned long ticks = 0;
+	int rep = 0;
 
-	/* Set anatop->enet_pll as 50MHz */
-	int r = enable_fec_anatop_clock(0, ENET_50MHZ);
-	if (r) {
-		printf("%s: enable_fec_anatop_clock: %d\n", __func__, r);
+	char* const start[] = {"usb", "start"};
+	if (cmd_process(0, ARRAY_SIZE(start), start, &rep, &ticks)) {
+		return -EIO;
 	}
-}
 
-static char * const usbcmd[] = {"usb", "start"};
+	return 0;
+}
 
 int board_late_init(void)
 {
-	int rep;
-	ulong ticks;
-
-	setup_usb();
-	setup_enet();
-
-	cmd_process(0, 2, usbcmd, &rep, &ticks);
+	select_fdt();
+	start_usb();
 
 	env_set("fdt_file", "/boot/datarespons-vdt6010-revA.dtb");
 
