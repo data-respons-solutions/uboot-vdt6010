@@ -202,24 +202,19 @@
 	"bootscript_usb=" BOOTSCRIPT_NOSECURE " \0" \
 	"validate_image=" VALIDATE_ZIMAGE " \0" \
 	"validate_initrd=" VALIDATE_INITRD " \0" \
-	"check_usb_boot=if usb storage; then run setusb; fi;\0" \
 	"initrd_addr=0x12C00000\0" \
 	"initrd_high=0xffffffff\0" \
 	"factory_args=setenv bootargs console=${console} rdinit=/linuxrc enable_wait_mode=off \0" \
 	"install_args=setenv bootargs console=${console} rdinit=/install_script enable_wait_mode=off \0" \
-	"factory_boot=run factory_args; bootz ${loadaddr} ${initrd_addr} ${fdt_addr}; \0" \
-	"testfact=run loadfdt loadimage loadinitrd factory_boot; \0" \
 	"habtest=run load_ivt_info loadimage; hab_auth_img ${loadaddr} ${filesize} ${ivt_offset}; \0" \
 	"install_boot=run install_args loadfdt loadimage loadinitrd; bootz ${loadaddr} ${initrd_addr} ${fdt_addr}; \0"
-#ifdef CONFIG_FACTORY_BOOT
-#define CONFIG_BOOTCOMMAND \
-	"mmc partconf 0 0 1 0;" \
-	"run factory_boot;"
-#else
+
+
 #define CONFIG_BOOTCOMMAND \
 	"mmc dev "MMC_DEV"; mmc rescan; " \
-	"if run check_usb_boot; then " \
+	"if usb storage; then " \
 		"echo booting from USB ...;" \
+		"run setusb;" \
 		"run bootscript_usb;" \
 		"echo USB boot failed, revert to MMC;" \
 	"fi; " \
@@ -235,7 +230,6 @@
 	"fi; " \
 	"run setmmc;" \
 	"run bootscript;"
-#endif
 
 /* Miscellaneous configurable options */
 #define CONFIG_SYS_PROMPT_HUSH_PS2     "> "
