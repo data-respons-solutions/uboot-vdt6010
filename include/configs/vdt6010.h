@@ -165,7 +165,7 @@
 	"fi;"
 
 #define BOOTSCRIPT_NOSECURE \
-	"run setargs; if run loadimage loadfdt; then bootz ${loadaddr} - ${fdt_addr}; else echo ERROR: Could not load prescribed config; fi;"
+	"run setargs; run loadfdt; if run loadimage; then bootz ${loadaddr} - ${fdt_addr}; else echo ERROR: Could not load prescribed config; fi;"
 
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
