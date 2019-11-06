@@ -48,7 +48,6 @@
 DECLARE_GLOBAL_DATA_PTR;
 
 #include "../common/mx6_common_defs.h"
-#include "../common/nvram/nvram.h"
 #include "vdt6010_pins.h"
 #include "vdt6010_gpio.h"
 
@@ -347,7 +346,6 @@ int board_init(void)
 
 	setup_usb();
 	setup_enet();
-	printf("NVRAM_TEST: %d\n", test_nvram());
 
 	return 0;
 }
