@@ -93,7 +93,6 @@
 /* This defines always booting from eMMC, rework mmc code
  * to support booting from usb -> sd -> mmc?
  */
-#define MMC_DEV "1"
 #define CONFIG_MMCROOT			"/dev/mmcblk0p1"
 
 #if defined(CONFIG_SECURE_BOOT) && defined(CONFIG_SPL)
@@ -102,6 +101,9 @@
 #define CONFIG_BOOT_RETRY_TIME 100
 #endif
 #endif
+
+/* boot configuration */
+#define DEFAULT_MMC_DEV "3"
 
 #define ZIMAGE_SECURE "/boot/zImage-ivt_signed"
 #define BOOTSCRIPT_SECURE \
@@ -191,7 +193,7 @@
 	"ivt_offset=0\0" \
 	"load_ivt_info=if ext4load ${bootfrom} ${bootdev}:${bootpart} 11F00000 /boot/zImage-padded-size; then env import -t 11F00000 ${filesize}; fi; \0" \
 	"load_initrd_ivt_info=if ext4load ${bootfrom} ${bootdev}:${bootpart} 11F00000 /boot/initrd-padded-size; then env import -t 11F00000 ${filesize}; fi; \0" \
-	"setmmc=setenv bootfrom mmc; setenv bootdev "MMC_DEV" ; setenv rootdev ${mmc_root}; \0 " \
+	"setmmc=setenv bootfrom mmc; setenv bootdev "DEFAULT_MMC_DEV" ; setenv rootdev ${mmc_root}; \0 " \
 	"setusb=setenv bootfrom usb; setenv bootdev 0; setenv bootpart 1; setenv rootdev ${usb_root}; echo Setting boot to usb; \0 " \
 	"loadimage=ext4load ${bootfrom} ${bootdev}:${bootpart} ${loadaddr} ${zimage}; \0" \
 	"loadinitrd=ext4load ${bootfrom} ${bootdev}:${bootpart} ${initrd_addr} ${initrd_file}; \0" \
@@ -211,7 +213,7 @@
 
 
 #define CONFIG_BOOTCOMMAND \
-	"mmc dev "MMC_DEV"; mmc rescan; " \
+	"mmc dev "DEFAULT_MMC_DEV"; mmc rescan; " \
 	"if usb storage; then " \
 		"echo booting from USB ...;" \
 		"run setusb;" \
