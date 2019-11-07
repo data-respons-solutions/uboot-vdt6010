@@ -70,8 +70,6 @@
 #define CONFIG_INITRD_TAG
 #define CONFIG_REVISION_TAG
 
-#define CONFIG_IMX_THERMAL
-
 /* Size of malloc() pool */
 #define CONFIG_SYS_MALLOC_LEN		(40 * SZ_1M)
 
