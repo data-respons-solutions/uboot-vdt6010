@@ -54,9 +54,6 @@ DECLARE_GLOBAL_DATA_PTR;
 #define BACKLIGHT_FREQ_HZ 1000
 #define BACKLIGHT_PERIOD_NS 1000000000 / BACKLIGHT_FREQ_HZ
 
-#define xstr(a) str(a)
-#define str(a) #a
-
 /*
  *
  * board_early_init_f
@@ -483,8 +480,6 @@ int board_late_init(void)
 	select_fdt();
 	start_usb();
 
-	env_set("fdt_file", "/boot/datarespons-vdt6010-revA.dtb");
-
 	if (imx_hab_is_enabled())
 	{
 		printf("HAB enabled, setting up secure bootscript\n");
@@ -500,9 +495,7 @@ int board_late_init(void)
 	}
 	else
 	{
-		printf("HAB disabled, setting up regular bootscript\n");
-		env_set("bootscript", BOOTSCRIPT_NOSECURE);
-		env_set("bootscript_usb", BOOTSCRIPT_NOSECURE);
+		printf("HAB disabled, using regular bootscript\n");
 	}
 
 	return 0;

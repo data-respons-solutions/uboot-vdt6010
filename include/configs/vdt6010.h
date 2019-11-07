@@ -90,10 +90,6 @@
 #define CONFIG_LOGLEVEL 4
 #endif
 #define CONSOLE_DEV		"ttymxc4"
-/* This defines always booting from eMMC, rework mmc code
- * to support booting from usb -> sd -> mmc?
- */
-#define CONFIG_MMCROOT			"/dev/mmcblk0p1"
 
 #if defined(CONFIG_SECURE_BOOT) && defined(CONFIG_SPL)
 #define CONFIG_RESET_TO_RETRY
@@ -103,7 +99,15 @@
 #endif
 
 /* boot configuration */
+#define DEFAULT_USB_DEV "0"
+#define DEFAULT_USB_PART "1"
+#define DEFAULT_USB_ROOT "/dev/sda1"
 #define DEFAULT_MMC_DEV "3"
+#define DEFAULT_MMC_PART "1"
+#define DEFAULT_MMC_ROOT "/dev/mmcblk3p1"
+#define DEFAULT_ZIMAGE "/boot/zImage"
+#define DEFAULT_INITRD "/boot/initrd"
+#define DEFAULT_FDT "/boot/datarespons-vdt6010-revA.dtb"
 
 #define ZIMAGE_SECURE "/boot/zImage-ivt_signed"
 #define BOOTSCRIPT_SECURE \
@@ -132,7 +136,7 @@
 		"fi; " \
 	"fi;"
 
-#define ZIMAGE "/boot/zImage"
+
 
 #define VALIDATE_ZIMAGE \
 	"if run load_ivt_info; then " \
@@ -167,71 +171,88 @@
 	"fi;"
 
 #define BOOTSCRIPT_NOSECURE \
-	"run setargs; run loadfdt; if run loadimage; then bootz ${loadaddr} - ${fdt_addr}; else echo ERROR: Could not load prescribed config; fi;"
-
+	"run setargs; run loadfdt;" \
+	"if run loadimage; then " \
+		"bootz ${loadaddr} - ${fdt_addr};" \
+	"else " \
+		"echo ERROR: Could not load prescribed config;" \
+	"fi;"
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	"bootretry="xstr(CONFIG_BOOT_RETRY_TIME)"\0" \
-	"zimage=" ZIMAGE "\0" \
+	"zimage="DEFAULT_ZIMAGE"\0" \
+	"initrd_file="DEFAULT_INITRD"\0" \
+	"fdt_file="DEFAULT_FDT"\0" \
 	"fdt_addr=0x11000000\0" \
 	"ip_dyn=try\0" \
 	"console=" CONSOLE_DEV ",115200\0" \
 	"fdt_high=0xffffffff\0"	  \
-	"fdt_file=" CONFIG_DEFAULT_FDT_FILE "\0" \
-	"fdt_file_def=" CONFIG_DEFAULT_FDT_FILE "\0" \
-	"initrd_file=/boot/initrd\0" \
 	"loglevel="xstr(CONFIG_LOGLEVEL)"\0" \
 	"consoleblank=0\0" \
 	"showtty=console=tty1\0" \
 	"setargs=setenv bootargs console=${console} root=${rootdev} rootwait ro rootfstype=ext4 consoleblank=${consoleblank} loglevel=${loglevel} ${showtty}\0" \
-	"bootdev=0\0" \
-	"bootpart=1\0" \
-	"bootfrom=mmc\0" \
-	"mmc_root=" CONFIG_MMCROOT "\0" \
-	"usb_root=/dev/sda1\0" \
-	"loadbootscript=if ext4load mmc 0:4 ${loadaddr} /boot/boot.txt; then env import -t ${loadaddr} ${filesize}; fi; \0" \
+	"loadbootscript=if ext4load ${bootfrom} ${bootdev}:${bootpart} ${loadaddr} /boot/boot.txt; then env import -t ${loadaddr} ${filesize}; fi; \0" \
 	"ivt_offset=0\0" \
 	"load_ivt_info=if ext4load ${bootfrom} ${bootdev}:${bootpart} 11F00000 /boot/zImage-padded-size; then env import -t 11F00000 ${filesize}; fi; \0" \
 	"load_initrd_ivt_info=if ext4load ${bootfrom} ${bootdev}:${bootpart} 11F00000 /boot/initrd-padded-size; then env import -t 11F00000 ${filesize}; fi; \0" \
-	"setmmc=setenv bootfrom mmc; setenv bootdev "DEFAULT_MMC_DEV" ; setenv rootdev ${mmc_root}; \0 " \
-	"setusb=setenv bootfrom usb; setenv bootdev 0; setenv bootpart 1; setenv rootdev ${usb_root}; echo Setting boot to usb; \0 " \
+	"setmmc=setenv bootfrom mmc; setenv bootdev "DEFAULT_MMC_DEV"; setenv bootpart "DEFAULT_MMC_PART"; setenv rootdev "DEFAULT_MMC_ROOT"; \0 " \
+	"setusb=setenv bootfrom usb; setenv bootdev "DEFAULT_USB_DEV"; setenv bootpart "DEFAULT_USB_PART"; setenv rootdev "DEFAULT_USB_ROOT"; \0 " \
 	"loadimage=ext4load ${bootfrom} ${bootdev}:${bootpart} ${loadaddr} ${zimage}; \0" \
 	"loadinitrd=ext4load ${bootfrom} ${bootdev}:${bootpart} ${initrd_addr} ${initrd_file}; \0" \
 	"loadfdt=ext4load ${bootfrom} ${bootdev}:${bootpart} ${fdt_addr} ${fdt_file}; \0" \
-	"loadfdtdef=ext4load ${bootfrom} ${bootdev}:${bootpart} ${fdt_addr} ${fdt_file_def}; \0" \
 	"bootscript_secure=" BOOTSCRIPT_SECURE " \0" \
 	"bootscript_nosecure=" BOOTSCRIPT_NOSECURE " \0" \
-	"bootscript_usb=" BOOTSCRIPT_NOSECURE " \0" \
+	"bootscript="BOOTSCRIPT_NOSECURE" \0" \
 	"validate_image=" VALIDATE_ZIMAGE " \0" \
 	"validate_initrd=" VALIDATE_INITRD " \0" \
 	"initrd_addr=0x12C00000\0" \
 	"initrd_high=0xffffffff\0" \
 	"factory_args=setenv bootargs console=${console} rdinit=/linuxrc enable_wait_mode=off \0" \
-	"install_args=setenv bootargs console=${console} rdinit=/install_script enable_wait_mode=off \0" \
 	"habtest=run load_ivt_info loadimage; hab_auth_img ${loadaddr} ${filesize} ${ivt_offset}; \0" \
 	"install_boot=run install_args loadfdt loadimage loadinitrd; bootz ${loadaddr} ${initrd_addr} ${fdt_addr}; \0"
 
+#define BOOT_PRELOADED \
+	"echo trying preloaded boot...;" \
+	"run factory_args;" \
+	"bootz ${loadaddr} ${initrd_addr} ${fdt_addr};" \
+	"echo    no preloaded image;"
+
+#define BOOT_USB \
+	"echo trying usb boot...;" \
+	"if usb storage; then " \
+		"run setusb;" \
+		"run loadbootscript;" \
+		"run bootscript;" \
+		"echo USB boot failed;" \
+	"else " \
+		"echo no usb device available;" \
+	"fi;"
+
+#define BOOT_MMC \
+	"echo trying mmc boot...;" \
+	"if mmc dev "DEFAULT_MMC_DEV"; then " \
+		"run setmmc;" \
+		"run loadbootscript;" \
+		"run bootscript;" \
+		"echo mmc boot failed;" \
+	"else " \
+		"echo no mmc device available;" \
+	"fi;"
 
 #define CONFIG_BOOTCOMMAND \
-	"mmc dev "DEFAULT_MMC_DEV"; mmc rescan; " \
-	"if usb storage; then " \
-		"echo booting from USB ...;" \
-		"run setusb;" \
-		"run bootscript_usb;" \
-		"echo USB boot failed, revert to MMC;" \
-	"fi; " \
-	"run loadbootscript;" \
-	"run setmmc;" \
-	"echo boot from MMC p${bootpart};" \
-	"run bootscript;" \
-	"echo boot from ${bootpart} failed, swapping;" \
+	"echo starting boot procedure...;" \
+	BOOT_PRELOADED  \
+	BOOT_USB \
+	BOOT_MMC \
+	"echo no boot device found;"
+
+/*
 	"if test ${bootpart} = 2; then " \
 		"setenv bootpart 1; setenv mmc_root /dev/mmcblk0p1;" \
 	"else " \
 		"setenv bootpart 2; setenv mmc_root /dev/mmcblk0p2;" \
 	"fi; " \
-	"run setmmc;" \
-	"run bootscript;"
+*/
 
 /* Miscellaneous configurable options */
 #define CONFIG_SYS_PROMPT_HUSH_PS2     "> "
