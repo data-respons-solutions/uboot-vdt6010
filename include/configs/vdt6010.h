@@ -77,17 +77,8 @@
 #define CONFIG_MXC_OCOTP
 #endif
 
-/* Serial console */
-#define CONFIG_BAUDRATE			115200
-
 #define CONFIG_LOADADDR                0x12000000
 
-/* linux parameters */
-#define CONFIG_MACH_TYPE	0xffffffff	/* Needed for newer kernels */
-#ifndef CONFIG_LOGLEVEL
-#define CONFIG_LOGLEVEL 4
-#endif
-#define CONSOLE_DEV		"ttymxc4"
 
 #if defined(CONFIG_SECURE_BOOT) && defined(CONFIG_SPL)
 #define CONFIG_RESET_TO_RETRY
@@ -95,6 +86,13 @@
 #define CONFIG_BOOT_RETRY_TIME 100
 #endif
 #endif
+
+/* linux parameters */
+#define CONFIG_MACH_TYPE	0xffffffff	/* Needed for newer kernels */
+#ifndef CONFIG_LOGLEVEL
+#define CONFIG_LOGLEVEL 4
+#endif
+#define CONSOLE_DEV		"ttymxc4"
 
 /* boot configuration */
 #define DEFAULT_USB_DEV "0"
@@ -277,6 +275,7 @@
 #define CONFIG_SYS_INIT_SP_ADDR \
 	(CONFIG_SYS_INIT_RAM_ADDR + CONFIG_SYS_INIT_SP_OFFSET)
 
+/* pwm configs */
 #define CONFIG_PWM_IMX
 #define CONFIG_IMX6_PWM_PER_CLK	66000000
 
