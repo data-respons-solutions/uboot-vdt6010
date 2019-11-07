@@ -48,37 +48,7 @@
 /* Secure boot */
 #define CONFIG_SYS_FSL_SEC_COMPAT 4
 
-/* Flash and environment organization
- *
- * Flash with 64k sector erase
- *
- * 0x0		~	0x400		- empty (1kb)
- * 0x400	~	0x30000		- SPL	(191kb)
- * 0x30000	~	0xF0000		- u-boot (768kb)
- * 0xF0000	~	0x100000	- env (64kb)
- * 0x100000	~	0x110000	- factory (64kb)
- * 0x110000	~	0x400000	- user (3008kb)
- */
-#define CONFIG_ENV_SIZE			0x10000
-
-#define CONFIG_SUPPORT_EMMC_BOOT /* eMMC specific */
-
 #include "mx6_common.h"
-
-#define CONFIG_CMDLINE_TAG
-#define CONFIG_SETUP_MEMORY_TAGS
-#define CONFIG_INITRD_TAG
-#define CONFIG_REVISION_TAG
-
-/* Size of malloc() pool */
-#define CONFIG_SYS_MALLOC_LEN		(40 * SZ_1M)
-
-#if defined(CONFIG_CMD_FUSE) || defined(CONFIG_IMX6_THERMAL)
-#define CONFIG_MXC_OCOTP
-#endif
-
-#define CONFIG_LOADADDR                0x12000000
-
 
 #if defined(CONFIG_SECURE_BOOT) && defined(CONFIG_SPL)
 #define CONFIG_RESET_TO_RETRY
@@ -87,7 +57,21 @@
 #endif
 #endif
 
+/* environment */
+#define CONFIG_LOADADDR			0x12000000
+#define CONFIG_SYS_LOAD_ADDR	CONFIG_LOADADDR
+#define CONFIG_ENV_SIZE			0x10000
+#define CONFIG_SYS_MALLOC_LEN	(40 * SZ_1M)
+
+/* uboot shell */
+#define CONFIG_SYS_PROMPT_HUSH_PS2     "> "
+#define CONFIG_SYS_BARGSIZE CONFIG_SYS_CBSIZE
+
 /* linux parameters */
+#define CONFIG_CMDLINE_TAG
+#define CONFIG_SETUP_MEMORY_TAGS
+#define CONFIG_INITRD_TAG
+#define CONFIG_REVISION_TAG
 #define CONFIG_MACH_TYPE	0xffffffff	/* Needed for newer kernels */
 #ifndef CONFIG_LOGLEVEL
 #define CONFIG_LOGLEVEL 4
@@ -102,10 +86,19 @@
 #define DEFAULT_MMC_PART "1"
 #define DEFAULT_MMC_ROOT "/dev/mmcblk3p1"
 #define DEFAULT_ZIMAGE "/boot/zImage"
+#define DEFAULT_ZIMAGE_SECURE "/boot/zImage-ivt_signed"
 #define DEFAULT_INITRD "/boot/initrd"
+#define DEFAULT_INITRD_SECURE "/boot/initrd-ivt_signed"
 #define DEFAULT_FDT "/boot/datarespons-vdt6010-revA.dtb"
 
-#define ZIMAGE_SECURE "/boot/zImage-ivt_signed"
+#define BOOTSCRIPT_NOSECURE \
+	"run setargs; run loadfdt;" \
+	"if run loadimage; then " \
+		"bootz ${loadaddr} - ${fdt_addr};" \
+	"else " \
+		"echo ERROR: Could not load prescribed config;" \
+	"fi;"
+
 #define BOOTSCRIPT_SECURE \
 	"run setargs; " \
 	"if run load_ivt_info; then " \
@@ -123,16 +116,6 @@
 	"else " \
 		"echo No IVT information; " \
 	"fi;"
-
-#define BOOTSCRIPT_USB_SECURE \
-	"echo running secure USB boot; run setargs;" \
-	"if run validate_image; then " \
-		"if run validate_initrd; then " \
-			"run loadfdt; bootz ${loadaddr} ${initrd_addr} ${fdt_addr}; " \
-		"fi; " \
-	"fi;"
-
-
 
 #define VALIDATE_ZIMAGE \
 	"if run load_ivt_info; then " \
@@ -164,14 +147,6 @@
 		"fi; " \
 	"else " \
 		"echo No IVT information && false; " \
-	"fi;"
-
-#define BOOTSCRIPT_NOSECURE \
-	"run setargs; run loadfdt;" \
-	"if run loadimage; then " \
-		"bootz ${loadaddr} - ${fdt_addr};" \
-	"else " \
-		"echo ERROR: Could not load prescribed config;" \
 	"fi;"
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
@@ -250,26 +225,11 @@
 	"fi; " \
 */
 
-/* Miscellaneous configurable options */
-#define CONFIG_SYS_PROMPT_HUSH_PS2     "> "
-#define CONFIG_SYS_BARGSIZE CONFIG_SYS_CBSIZE
-
-#define CONFIG_SYS_LOAD_ADDR           CONFIG_LOADADDR
 
 /* Physical Memory Map */
-
-/*
- * u-boot 2018.11 complains this is already defined.
- * Should this be undefined in our board?"
- * #define CONFIG_NR_DRAM_BANKS           1*/
-#define PHYS_SDRAM                     MMDC0_ARB_BASE_ADDR
-#define PHYS_SDRAM_SIZE		(2u * 1024 * 1024 * 1024)
-
-#define CONFIG_SYS_SDRAM_BASE          PHYS_SDRAM
+#define CONFIG_SYS_SDRAM_BASE          MMDC0_ARB_BASE_ADDR
 #define CONFIG_SYS_INIT_RAM_ADDR       IRAM_BASE_ADDR
 #define CONFIG_SYS_INIT_RAM_SIZE       IRAM_SIZE
-
-
 #define CONFIG_SYS_INIT_SP_OFFSET \
 	(CONFIG_SYS_INIT_RAM_SIZE - GENERATED_GBL_DATA_SIZE)
 #define CONFIG_SYS_INIT_SP_ADDR \

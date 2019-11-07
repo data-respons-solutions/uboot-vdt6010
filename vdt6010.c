@@ -339,7 +339,7 @@ static void setup_enet(void)
 int board_init(void)
 {
 	// address of boot parameters
-	gd->bd->bi_boot_params = PHYS_SDRAM + 0x100;
+	gd->bd->bi_boot_params = CONFIG_SYS_SDRAM_BASE + 0x100;
 
 	setup_usb();
 	setup_enet();
@@ -480,18 +480,11 @@ int board_late_init(void)
 	select_fdt();
 	start_usb();
 
-	if (imx_hab_is_enabled())
-	{
+	if (imx_hab_is_enabled()) {
 		printf("HAB enabled, setting up secure bootscript\n");
 		env_set("bootscript", BOOTSCRIPT_SECURE);
-		env_set("zimage", ZIMAGE_SECURE);
-		env_set("initrd_file", "/boot/initrd-ivt_signed");
-#ifdef CONFIG_BOOT_USB_INITRD
-		env_set("bootscript_usb", BOOTSCRIPT_USB_SECURE);
-#else
-		env_set("bootscript_usb", BOOTSCRIPT_SECURE);
-#endif
-		//env_set("bootdelay", "0");
+		env_set("zimage", DEFAULT_ZIMAGE_SECURE);
+		env_set("initrd_file", DEFAULT_INITRD_SECURE);
 	}
 	else
 	{
