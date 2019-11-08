@@ -48,6 +48,7 @@
 DECLARE_GLOBAL_DATA_PTR;
 
 #include "../common/mx6_common_defs.h"
+#include "../common/bootsplash/bootsplash.h"
 #include "vdt6010_pins.h"
 #include "vdt6010_gpio.h"
 
@@ -477,6 +478,13 @@ static int start_usb(void)
 
 int board_late_init(void)
 {
+	int r = 0;
+
+	printf("Enabling bootsplash...\n");
+	if ((r = bootsplash_load())) {
+		printf("Failed loading bootsplash [%d]: %s\n", -r, errno_str(-r));
+	}
+
 	select_fdt();
 	start_usb();
 

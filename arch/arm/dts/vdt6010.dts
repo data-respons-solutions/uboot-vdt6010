@@ -289,6 +289,11 @@
 				label = "user_b";
 				reg = <0x150000 0x10000>;
 			};
+			
+			splash@0x200000 {
+				label = "splash";
+				reg = <0x200000 0x200000>;
+			};
 		};
 	};
 };
