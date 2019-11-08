@@ -1,8 +1,3 @@
-// #define CONFIG_PANIC_HANG
-// CONFIG_SPL_NOR_SUPPORT
-// SPL_SPI_FLASH_SUPPORT
-// SPL_SPI_LOAD
-// CONFIG_SPL_POWER_SUPPORT
 /*
  * Copyright (C) 2019 Data Respons Solutions AB
  *
@@ -11,45 +6,27 @@
  * SPDX-License-Identifier:	GPL-2.0+
  */
 #include <errno.h>
+#include <version.h>
 #include <asm/arch/clock.h>
 #include <asm/arch/imx-regs.h>
-#include <asm/mach-imx/spi.h>
-#include <linux/kernel.h>
-#include <asm/mach-imx/mxc_i2c.h>
-#include <asm/mach-imx/boot_mode.h>
-#include <asm/mach-imx/video.h>
-#include <mmc.h>
-#include <fsl_esdhc.h>
-#include <miiphy.h>
-#include <netdev.h>
 #include <asm/arch/mxc_hdmi.h>
 #include <asm/arch/crm_regs.h>
+#include <asm/mach-imx/video.h>
+#include <asm/mach-imx/hab.h>
+#include <linux/libfdt.h>
 #include <asm/io.h>
+#include <asm/gpio.h>
 #include <asm/arch/sys_proto.h>
-#include <i2c.h>
-#include <input.h>
-#include <usb.h>
-#include <usb/ehci-ci.h>
-#include <environment.h>
-#include <usb.h>
+#include <dm.h>
 #include <pwm.h>
-#include <version.h>
-#include <watchdog.h>
 #include <power/pmic.h>
 #include <power/pfuze100_pmic.h>
-#include <dm.h>
 #include <power/regulator.h>
-#include <asm/gpio.h>
-#include <linux/libfdt.h>
-
-#include <asm/mach-imx/hab.h>
-#include <vsprintf.h>
 #include "../common/include/bootsplash.h"
-
-DECLARE_GLOBAL_DATA_PTR;
-
 #include "vdt6010_pins.h"
 #include "vdt6010_gpio.h"
+
+DECLARE_GLOBAL_DATA_PTR;
 
 #define BACKLIGHT_FREQ_HZ 1000
 #define BACKLIGHT_PERIOD_NS 1000000000 / BACKLIGHT_FREQ_HZ
@@ -248,48 +225,10 @@ static void setup_display(void)
 	writel(reg, &iomux->gpr[3]);
 }
 
-int overwrite_console(void)
-{
-	return 1;
-}
-
 int board_early_init_f(void)
 {
 	setup_display();
 
-	return 0;
-}
-
-/*
- *
- * checkboard
- *
- */
-
-static const char* BOARD = "VDT6010";
-static const char* VENDOR = "Data Respons Solutions AB";
-
-static const char* hw_string[8] = {
-	"REVA",
-	"REVB",
-	"REVC",
-	"REVD",
-	"REVE",
-	"FUTURE",
-	"FUTURE",
-	"FUTURE",
-};
-
-static int get_version(void)
-{
-	return 0;
-}
-
-int checkboard(void)
-{
-	printf("Vendor: %s\n", VENDOR);
-	printf("Board: %s\n", BOARD);
-	printf("HW version: %s\n", hw_string[get_version()]);
 	return 0;
 }
 
@@ -308,8 +247,6 @@ int dram_init(void)
 /*
  *
  * board_init
- *
- * Setup chipselects
  *
  */
 static void setup_usb(void)
