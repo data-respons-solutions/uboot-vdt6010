@@ -5,7 +5,7 @@
 #include <asm/arch/iomux.h>
 #include <asm/mach-imx/iomux-v3.h>
 #include <asm/mach-imx/mxc_i2c.h>
-#include "../common/mx6_common_defs.h"
+#include "../common/include/mx6_common_defs.h"
 
 static iomux_v3_cfg_t const uart5_pads[] = {
 	IOMUX_PADS(PAD_CSI0_DAT14__UART5_TX_DATA	| MUX_PAD_CTRL(UART_PAD_CTRL)),

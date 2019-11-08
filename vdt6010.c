@@ -44,11 +44,10 @@
 
 #include <asm/mach-imx/hab.h>
 #include <vsprintf.h>
+#include "../common/include/bootsplash.h"
 
 DECLARE_GLOBAL_DATA_PTR;
 
-#include "../common/mx6_common_defs.h"
-#include "../common/bootsplash/bootsplash.h"
 #include "vdt6010_pins.h"
 #include "vdt6010_gpio.h"
 
