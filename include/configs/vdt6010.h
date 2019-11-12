@@ -73,9 +73,6 @@
 #define CONFIG_INITRD_TAG
 #define CONFIG_REVISION_TAG
 #define CONFIG_MACH_TYPE	0xffffffff	/* Needed for newer kernels */
-#ifndef CONFIG_LOGLEVEL
-#define CONFIG_LOGLEVEL 4
-#endif
 
 /* boot configuration */
 #define DEFAULT_USB_DEV "0"
@@ -86,140 +83,17 @@
 #define DEFAULT_ZIMAGE_SECURE "/boot/zImage-ivt_signed"
 #define DEFAULT_INITRD "/boot/initrd"
 #define DEFAULT_INITRD_SECURE "/boot/initrd-ivt_signed"
+#define DEFAULT_INITRD_ADDR "0x12C00000"
 #define DEFAULT_FDT "/boot/datarespons-vdt6010-revA.dtb"
+#define DEFAULT_FDT_ADDR "0x11000000"
+#define DEFAULT_LOGLEVEL "4"
+#define DEFAULT_CONSOLEBLANK "0"
 
-#define BOOTSCRIPT_NOSECURE \
-	"run setargs; run loadfdt;" \
-	"if run loadimage; then " \
-		"bootz ${loadaddr} - ${fdt_addr};" \
-	"else " \
-		"echo ERROR: Could not load prescribed config;" \
-	"fi;"
-
-#define BOOTSCRIPT_SECURE \
-	"run setargs; " \
-	"if run load_ivt_info; then " \
-		"echo IVT starts at ${ivt_offset}; " \
-		"if run loadimage; then " \
-			"if hab_auth_img ${loadaddr} ${filesize} ${ivt_offset}; then " \
-				"echo Authenticated kernel; " \
-				"run loadfdt; bootz ${loadaddr} - ${fdt_addr}; " \
-			"else " \
-				"echo Failed to authenticate kernel; " \
-			"fi; " \
-		"else " \
-			"echo Failed to load image ${zimage}; " \
-		"fi; " \
-	"else " \
-		"echo No IVT information; " \
-	"fi;"
-
-#define VALIDATE_ZIMAGE \
-	"if run load_ivt_info; then " \
-		"echo kernel IVT starts at ${ivt_offset}; " \
-		"if run loadimage; then " \
-			"if hab_auth_img ${loadaddr} ${filesize} ${ivt_offset}; then " \
-				"echo Authenticated kernel; " \
-			"else " \
-				"echo Failed to authenticate kernel && false;" \
-			"fi; " \
-		"else " \
-			"echo Failed to load image ${zimage} && false; " \
-		"fi; " \
-	"else " \
-		"echo No IVT information && false; " \
-	"fi;"
-
-#define VALIDATE_INITRD \
-	"if run load_initrd_ivt_info; then " \
-		"echo INITRD IVT loaded at ${initrd_addr} offset is ${ivt_offset}; " \
-		"if run loadinitrd; then " \
-			"if hab_auth_img ${initrd_addr} ${filesize} ${ivt_offset}; then " \
-				"echo Authenticated initrd; " \
-			"else " \
-				"echo Failed to authenticate initrd && false; " \
-			"fi; " \
-		"else " \
-			"echo Failed to load image ${initrd_file} && false; " \
-		"fi; " \
-	"else " \
-		"echo No IVT information && false; " \
-	"fi;"
-
-#define BOOT_PRELOADED \
-	"echo trying preloaded boot...;" \
-	"run factory_args;" \
-	"bootz ${loadaddr} ${initrd_addr} ${fdt_addr};" \
-	"echo    no preloaded image;"
-
-#define BOOT_USB \
-	"echo trying usb boot...;" \
-	"if usb storage; then " \
-		"if part uuid usb ${usbdev}:${usbpart} partuuid; then " \
-			"run setusb;" \
-			"run loadbootscript;" \
-			"run bootscript;" \
-			"echo USB boot failed;" \
-		"else " \
-			"echo failed getting usb part uuid;" \
-		"fi;" \
-	"else " \
-		"echo no usb device available;" \
-	"fi;"
-
-#define BOOT_MMC \
-	"echo trying mmc boot...;" \
-	"if mmc dev ${mmcdev}; then " \
-		"if part uuid mmc ${mmcdev}:${mmcpart} partuuid; then " \
-			"run setmmc;" \
-			"run loadbootscript;" \
-			"run bootscript;" \
-			"echo mmc boot failed;" \
-		"else " \
-			"echo failed gettinc mmc part uuid;" \
-		"fi;" \
-	"else " \
-		"echo no mmc device available;" \
-	"fi;"
+#include "datarespons.h"
 
 #define CONFIG_EXTRA_ENV_SETTINGS \
 	"bootretry="xstr(CONFIG_BOOT_RETRY_TIME)"\0" \
-	"zimage="DEFAULT_ZIMAGE"\0" \
-	"initrd_file="DEFAULT_INITRD"\0" \
-	"fdt_file="DEFAULT_FDT"\0" \
-	"fdt_addr=0x11000000\0" \
-	"ip_dyn=try\0" \
-	"fdt_high=0xffffffff\0"	  \
-	"loglevel="xstr(CONFIG_LOGLEVEL)"\0" \
-	"consoleblank=0\0" \
-	"showtty=console=tty1\0" \
-	"setargs=setenv bootargs root=${rootdev} rootwait ro rootfstype=ext4 consoleblank=${consoleblank} loglevel=${loglevel} ${showtty}\0" \
-	"loadbootscript=if ext4load ${bootfrom} ${bootdev}:${bootpart} ${loadaddr} /boot/boot.txt; then env import -t ${loadaddr} ${filesize}; fi; \0" \
-	"ivt_offset=0\0" \
-	"load_ivt_info=if ext4load ${bootfrom} ${bootdev}:${bootpart} 11F00000 /boot/zImage-padded-size; then env import -t 11F00000 ${filesize}; fi; \0" \
-	"load_initrd_ivt_info=if ext4load ${bootfrom} ${bootdev}:${bootpart} 11F00000 /boot/initrd-padded-size; then env import -t 11F00000 ${filesize}; fi; \0" \
-	"mmcdev="DEFAULT_MMC_DEV"\0" \
-	"mmcpart="DEFAULT_MMC_PART"\0" \
-	"usbdev="DEFAULT_USB_DEV"\0" \
-	"usbpart="DEFAULT_USB_PART"\0" \
-	"setmmc=setenv bootfrom mmc; setenv bootdev ${mmcdev}; setenv bootpart ${mmcpart}; setenv rootdev PARTUUID=${partuuid}; \0 " \
-	"setusb=setenv bootfrom usb; setenv bootdev ${usbdev}; setenv bootpart ${usbpart}; setenv rootdev PARTUUID=${partuuid}; \0 " \
-	"loadimage=ext4load ${bootfrom} ${bootdev}:${bootpart} ${loadaddr} ${zimage}; \0" \
-	"loadinitrd=ext4load ${bootfrom} ${bootdev}:${bootpart} ${initrd_addr} ${initrd_file}; \0" \
-	"loadfdt=ext4load ${bootfrom} ${bootdev}:${bootpart} ${fdt_addr} ${fdt_file}; \0" \
-	"bootscript_secure=" BOOTSCRIPT_SECURE " \0" \
-	"bootscript_nosecure=" BOOTSCRIPT_NOSECURE " \0" \
-	"bootscript="BOOTSCRIPT_NOSECURE"\0" \
-	"bootmmc="BOOT_MMC"\0" \
-	"bootpreloaded="BOOT_PRELOADED"\0" \
-	"bootusb="BOOT_USB"\0" \
-	"validate_image=" VALIDATE_ZIMAGE "\0" \
-	"validate_initrd=" VALIDATE_INITRD "\0" \
-	"initrd_addr=0x12C00000\0" \
-	"initrd_high=0xffffffff\0" \
-	"factory_args=setenv bootargs console=${console} rdinit=/linuxrc enable_wait_mode=off \0" \
-	"habtest=run load_ivt_info loadimage; hab_auth_img ${loadaddr} ${filesize} ${ivt_offset}; \0" \
-	"install_boot=run install_args loadfdt loadimage loadinitrd; bootz ${loadaddr} ${initrd_addr} ${fdt_addr}; \0"
+	DATARESPONS_BOOT_SCRIPTS
 
 #define CONFIG_BOOTCOMMAND \
 	"echo starting boot procedure...;" \
