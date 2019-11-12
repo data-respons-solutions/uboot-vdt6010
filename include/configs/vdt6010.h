@@ -76,7 +76,6 @@
 #ifndef CONFIG_LOGLEVEL
 #define CONFIG_LOGLEVEL 4
 #endif
-#define CONSOLE_DEV		"ttymxc4"
 
 /* boot configuration */
 #define DEFAULT_USB_DEV "0"
@@ -190,12 +189,11 @@
 	"fdt_file="DEFAULT_FDT"\0" \
 	"fdt_addr=0x11000000\0" \
 	"ip_dyn=try\0" \
-	"console=" CONSOLE_DEV ",115200\0" \
 	"fdt_high=0xffffffff\0"	  \
 	"loglevel="xstr(CONFIG_LOGLEVEL)"\0" \
 	"consoleblank=0\0" \
 	"showtty=console=tty1\0" \
-	"setargs=setenv bootargs console=${console} root=${rootdev} rootwait ro rootfstype=ext4 consoleblank=${consoleblank} loglevel=${loglevel} ${showtty}\0" \
+	"setargs=setenv bootargs root=${rootdev} rootwait ro rootfstype=ext4 consoleblank=${consoleblank} loglevel=${loglevel} ${showtty}\0" \
 	"loadbootscript=if ext4load ${bootfrom} ${bootdev}:${bootpart} ${loadaddr} /boot/boot.txt; then env import -t ${loadaddr} ${filesize}; fi; \0" \
 	"ivt_offset=0\0" \
 	"load_ivt_info=if ext4load ${bootfrom} ${bootdev}:${bootpart} 11F00000 /boot/zImage-padded-size; then env import -t 11F00000 ${filesize}; fi; \0" \
