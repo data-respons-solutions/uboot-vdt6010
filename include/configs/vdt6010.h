@@ -81,10 +81,8 @@
 /* boot configuration */
 #define DEFAULT_USB_DEV "0"
 #define DEFAULT_USB_PART "1"
-#define DEFAULT_USB_ROOT "/dev/sda1"
 #define DEFAULT_MMC_DEV "3"
 #define DEFAULT_MMC_PART "1"
-#define DEFAULT_MMC_ROOT "/dev/mmcblk3p1"
 #define DEFAULT_ZIMAGE "/boot/zImage"
 #define DEFAULT_ZIMAGE_SECURE "/boot/zImage-ivt_signed"
 #define DEFAULT_INITRD "/boot/initrd"
@@ -166,8 +164,12 @@
 	"ivt_offset=0\0" \
 	"load_ivt_info=if ext4load ${bootfrom} ${bootdev}:${bootpart} 11F00000 /boot/zImage-padded-size; then env import -t 11F00000 ${filesize}; fi; \0" \
 	"load_initrd_ivt_info=if ext4load ${bootfrom} ${bootdev}:${bootpart} 11F00000 /boot/initrd-padded-size; then env import -t 11F00000 ${filesize}; fi; \0" \
-	"setmmc=setenv bootfrom mmc; setenv bootdev "DEFAULT_MMC_DEV"; setenv bootpart "DEFAULT_MMC_PART"; setenv rootdev "DEFAULT_MMC_ROOT"; \0 " \
-	"setusb=setenv bootfrom usb; setenv bootdev "DEFAULT_USB_DEV"; setenv bootpart "DEFAULT_USB_PART"; setenv rootdev "DEFAULT_USB_ROOT"; \0 " \
+	"mmcdev="DEFAULT_MMC_DEV"\0" \
+	"mmcpart="DEFAULT_MMC_PART"\0" \
+	"usbdev="DEFAULT_USB_DEV"\0" \
+	"usbpart="DEFAULT_USB_PART"\0" \
+	"setmmc=setenv bootfrom mmc; setenv bootdev ${mmcdev}; setenv bootpart ${mmcpart}; setenv rootdev PARTUUID=${partuuid}; \0 " \
+	"setusb=setenv bootfrom usb; setenv bootdev ${usbdev}; setenv bootpart ${usbpart}; setenv rootdev PARTUUID=${partuuid}; \0 " \
 	"loadimage=ext4load ${bootfrom} ${bootdev}:${bootpart} ${loadaddr} ${zimage}; \0" \
 	"loadinitrd=ext4load ${bootfrom} ${bootdev}:${bootpart} ${initrd_addr} ${initrd_file}; \0" \
 	"loadfdt=ext4load ${bootfrom} ${bootdev}:${bootpart} ${fdt_addr} ${fdt_file}; \0" \
@@ -191,21 +193,29 @@
 #define BOOT_USB \
 	"echo trying usb boot...;" \
 	"if usb storage; then " \
-		"run setusb;" \
-		"run loadbootscript;" \
-		"run bootscript;" \
-		"echo USB boot failed;" \
+		"if part uuid usb ${usbdev}:${usbpart} partuuid; then " \
+			"run setusb;" \
+			"run loadbootscript;" \
+			"run bootscript;" \
+			"echo USB boot failed;" \
+		"else " \
+			"echo failed getting usb part uuid;" \
+		"fi;" \
 	"else " \
 		"echo no usb device available;" \
 	"fi;"
 
 #define BOOT_MMC \
 	"echo trying mmc boot...;" \
-	"if mmc dev "DEFAULT_MMC_DEV"; then " \
-		"run setmmc;" \
-		"run loadbootscript;" \
-		"run bootscript;" \
-		"echo mmc boot failed;" \
+	"if mmc dev ${mmcdev}; then " \
+		"if part uuid mmc ${mmcdev}:${mmcpart} partuuid; then " \
+			"run setmmc;" \
+			"run loadbootscript;" \
+			"run bootscript;" \
+			"echo mmc boot failed;" \
+		"else " \
+			"echo failed gettinc mmc part uuid;" \
+		"fi;" \
 	"else " \
 		"echo no mmc device available;" \
 	"fi;"
@@ -216,15 +226,6 @@
 	BOOT_USB \
 	BOOT_MMC \
 	"echo no boot device found;"
-
-/*
-	"if test ${bootpart} = 2; then " \
-		"setenv bootpart 1; setenv mmc_root /dev/mmcblk0p1;" \
-	"else " \
-		"setenv bootpart 2; setenv mmc_root /dev/mmcblk0p2;" \
-	"fi; " \
-*/
-
 
 /* Physical Memory Map */
 #define CONFIG_SYS_SDRAM_BASE          MMDC0_ARB_BASE_ADDR
