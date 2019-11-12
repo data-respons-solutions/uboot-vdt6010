@@ -147,43 +147,6 @@
 		"echo No IVT information && false; " \
 	"fi;"
 
-#define CONFIG_EXTRA_ENV_SETTINGS \
-	"bootretry="xstr(CONFIG_BOOT_RETRY_TIME)"\0" \
-	"zimage="DEFAULT_ZIMAGE"\0" \
-	"initrd_file="DEFAULT_INITRD"\0" \
-	"fdt_file="DEFAULT_FDT"\0" \
-	"fdt_addr=0x11000000\0" \
-	"ip_dyn=try\0" \
-	"console=" CONSOLE_DEV ",115200\0" \
-	"fdt_high=0xffffffff\0"	  \
-	"loglevel="xstr(CONFIG_LOGLEVEL)"\0" \
-	"consoleblank=0\0" \
-	"showtty=console=tty1\0" \
-	"setargs=setenv bootargs console=${console} root=${rootdev} rootwait ro rootfstype=ext4 consoleblank=${consoleblank} loglevel=${loglevel} ${showtty}\0" \
-	"loadbootscript=if ext4load ${bootfrom} ${bootdev}:${bootpart} ${loadaddr} /boot/boot.txt; then env import -t ${loadaddr} ${filesize}; fi; \0" \
-	"ivt_offset=0\0" \
-	"load_ivt_info=if ext4load ${bootfrom} ${bootdev}:${bootpart} 11F00000 /boot/zImage-padded-size; then env import -t 11F00000 ${filesize}; fi; \0" \
-	"load_initrd_ivt_info=if ext4load ${bootfrom} ${bootdev}:${bootpart} 11F00000 /boot/initrd-padded-size; then env import -t 11F00000 ${filesize}; fi; \0" \
-	"mmcdev="DEFAULT_MMC_DEV"\0" \
-	"mmcpart="DEFAULT_MMC_PART"\0" \
-	"usbdev="DEFAULT_USB_DEV"\0" \
-	"usbpart="DEFAULT_USB_PART"\0" \
-	"setmmc=setenv bootfrom mmc; setenv bootdev ${mmcdev}; setenv bootpart ${mmcpart}; setenv rootdev PARTUUID=${partuuid}; \0 " \
-	"setusb=setenv bootfrom usb; setenv bootdev ${usbdev}; setenv bootpart ${usbpart}; setenv rootdev PARTUUID=${partuuid}; \0 " \
-	"loadimage=ext4load ${bootfrom} ${bootdev}:${bootpart} ${loadaddr} ${zimage}; \0" \
-	"loadinitrd=ext4load ${bootfrom} ${bootdev}:${bootpart} ${initrd_addr} ${initrd_file}; \0" \
-	"loadfdt=ext4load ${bootfrom} ${bootdev}:${bootpart} ${fdt_addr} ${fdt_file}; \0" \
-	"bootscript_secure=" BOOTSCRIPT_SECURE " \0" \
-	"bootscript_nosecure=" BOOTSCRIPT_NOSECURE " \0" \
-	"bootscript="BOOTSCRIPT_NOSECURE" \0" \
-	"validate_image=" VALIDATE_ZIMAGE " \0" \
-	"validate_initrd=" VALIDATE_INITRD " \0" \
-	"initrd_addr=0x12C00000\0" \
-	"initrd_high=0xffffffff\0" \
-	"factory_args=setenv bootargs console=${console} rdinit=/linuxrc enable_wait_mode=off \0" \
-	"habtest=run load_ivt_info loadimage; hab_auth_img ${loadaddr} ${filesize} ${ivt_offset}; \0" \
-	"install_boot=run install_args loadfdt loadimage loadinitrd; bootz ${loadaddr} ${initrd_addr} ${fdt_addr}; \0"
-
 #define BOOT_PRELOADED \
 	"echo trying preloaded boot...;" \
 	"run factory_args;" \
@@ -220,11 +183,51 @@
 		"echo no mmc device available;" \
 	"fi;"
 
+#define CONFIG_EXTRA_ENV_SETTINGS \
+	"bootretry="xstr(CONFIG_BOOT_RETRY_TIME)"\0" \
+	"zimage="DEFAULT_ZIMAGE"\0" \
+	"initrd_file="DEFAULT_INITRD"\0" \
+	"fdt_file="DEFAULT_FDT"\0" \
+	"fdt_addr=0x11000000\0" \
+	"ip_dyn=try\0" \
+	"console=" CONSOLE_DEV ",115200\0" \
+	"fdt_high=0xffffffff\0"	  \
+	"loglevel="xstr(CONFIG_LOGLEVEL)"\0" \
+	"consoleblank=0\0" \
+	"showtty=console=tty1\0" \
+	"setargs=setenv bootargs console=${console} root=${rootdev} rootwait ro rootfstype=ext4 consoleblank=${consoleblank} loglevel=${loglevel} ${showtty}\0" \
+	"loadbootscript=if ext4load ${bootfrom} ${bootdev}:${bootpart} ${loadaddr} /boot/boot.txt; then env import -t ${loadaddr} ${filesize}; fi; \0" \
+	"ivt_offset=0\0" \
+	"load_ivt_info=if ext4load ${bootfrom} ${bootdev}:${bootpart} 11F00000 /boot/zImage-padded-size; then env import -t 11F00000 ${filesize}; fi; \0" \
+	"load_initrd_ivt_info=if ext4load ${bootfrom} ${bootdev}:${bootpart} 11F00000 /boot/initrd-padded-size; then env import -t 11F00000 ${filesize}; fi; \0" \
+	"mmcdev="DEFAULT_MMC_DEV"\0" \
+	"mmcpart="DEFAULT_MMC_PART"\0" \
+	"usbdev="DEFAULT_USB_DEV"\0" \
+	"usbpart="DEFAULT_USB_PART"\0" \
+	"setmmc=setenv bootfrom mmc; setenv bootdev ${mmcdev}; setenv bootpart ${mmcpart}; setenv rootdev PARTUUID=${partuuid}; \0 " \
+	"setusb=setenv bootfrom usb; setenv bootdev ${usbdev}; setenv bootpart ${usbpart}; setenv rootdev PARTUUID=${partuuid}; \0 " \
+	"loadimage=ext4load ${bootfrom} ${bootdev}:${bootpart} ${loadaddr} ${zimage}; \0" \
+	"loadinitrd=ext4load ${bootfrom} ${bootdev}:${bootpart} ${initrd_addr} ${initrd_file}; \0" \
+	"loadfdt=ext4load ${bootfrom} ${bootdev}:${bootpart} ${fdt_addr} ${fdt_file}; \0" \
+	"bootscript_secure=" BOOTSCRIPT_SECURE " \0" \
+	"bootscript_nosecure=" BOOTSCRIPT_NOSECURE " \0" \
+	"bootscript="BOOTSCRIPT_NOSECURE"\0" \
+	"bootmmc="BOOT_MMC"\0" \
+	"bootpreloaded="BOOT_PRELOADED"\0" \
+	"bootusb="BOOT_USB"\0" \
+	"validate_image=" VALIDATE_ZIMAGE "\0" \
+	"validate_initrd=" VALIDATE_INITRD "\0" \
+	"initrd_addr=0x12C00000\0" \
+	"initrd_high=0xffffffff\0" \
+	"factory_args=setenv bootargs console=${console} rdinit=/linuxrc enable_wait_mode=off \0" \
+	"habtest=run load_ivt_info loadimage; hab_auth_img ${loadaddr} ${filesize} ${ivt_offset}; \0" \
+	"install_boot=run install_args loadfdt loadimage loadinitrd; bootz ${loadaddr} ${initrd_addr} ${fdt_addr}; \0"
+
 #define CONFIG_BOOTCOMMAND \
 	"echo starting boot procedure...;" \
-	BOOT_PRELOADED  \
-	BOOT_USB \
-	BOOT_MMC \
+	"run bootpreloaded;" \
+	"run bootusb;" \
+	"run bootmmc;" \
 	"echo no boot device found;"
 
 /* Physical Memory Map */
