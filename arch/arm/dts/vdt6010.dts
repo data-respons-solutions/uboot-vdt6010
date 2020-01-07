@@ -303,8 +303,8 @@
 	pinctrl-names = "default", "gpio";
 	pinctrl-0 = <&pinctrl_i2c1>;
 	pinctrl-1 = <&pinctrl_i2c1_gpio>;
-	scl-gpios = <&gpio3 21 GPIO_ACTIVE_LOW>;
-	sda-gpios = <&gpio3 28 GPIO_ACTIVE_LOW>;
+	scl-gpios = <&gpio3 21 (GPIO_ACTIVE_LOW|GPIO_OPEN_DRAIN)>;
+	sda-gpios = <&gpio3 28 (GPIO_ACTIVE_LOW|GPIO_OPEN_DRAIN)>;
 	status = "okay";
 
 	opt3001@45 {
@@ -324,8 +324,8 @@
 	pinctrl-names = "default", "gpio";
 	pinctrl-0 = <&pinctrl_i2c2>;
 	pinctrl-1 = <&pinctrl_i2c2_gpio>;
-	scl-gpios = <&gpio4 12 GPIO_ACTIVE_LOW>;
-	sda-gpios = <&gpio4 13 GPIO_ACTIVE_LOW>;
+	scl-gpios = <&gpio4 12 (GPIO_ACTIVE_LOW|GPIO_OPEN_DRAIN)>;
+	sda-gpios = <&gpio4 13 (GPIO_ACTIVE_LOW|GPIO_OPEN_DRAIN)>;
 	status = "okay";
 /*
 	hdmi: edid@50 {
@@ -439,8 +439,8 @@
 	pinctrl-names = "default", "gpio";
 	pinctrl-0 = <&pinctrl_i2c3>;
 	pinctrl-1 = <&pinctrl_i2c3_gpio>;
-	scl-gpios = <&gpio3 17 GPIO_ACTIVE_LOW>;
-	sda-gpios = <&gpio3 18 GPIO_ACTIVE_LOW>;
+	scl-gpios = <&gpio3 17 (GPIO_ACTIVE_LOW|GPIO_OPEN_DRAIN)>;
+	sda-gpios = <&gpio3 18 (GPIO_ACTIVE_LOW|GPIO_OPEN_DRAIN)>;
 	status = "okay";
 
 	s35390a_rtc: rtc@30 {
