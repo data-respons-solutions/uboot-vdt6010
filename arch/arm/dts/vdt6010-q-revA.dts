@@ -327,12 +327,7 @@
 	scl-gpios = <&gpio4 12 (GPIO_ACTIVE_LOW|GPIO_OPEN_DRAIN)>;
 	sda-gpios = <&gpio4 13 (GPIO_ACTIVE_LOW|GPIO_OPEN_DRAIN)>;
 	status = "okay";
-/*
-	hdmi: edid@50 {
-		compatible = "fsl,imx6-hdmi-i2c";
-		reg = <0x50>;
-	};
-*/
+
 	pmic: pfuze100@08 {
 		compatible = "fsl,pfuze100";
 		reg = <0x08>;
@@ -571,12 +566,6 @@
 	status = "okay";
 };
 
-
-&cpu0 {
-	arm-supply = <&reg_arm>;
-	soc-supply = <&reg_soc>;
-};
-
 &gpc {
 	fsl,ldo-bypass = <0>;
 	fsl,wdog-reset = <1>;
@@ -592,14 +581,6 @@
 
 &snvs_poweroff {
 	status = "okay";
-};
-
-&can1 {
-	status = "disabled";
-};
-
-&can2 {
-	status = "disabled";
 };
 
 &iomuxc {
@@ -826,39 +807,10 @@
 	};
 };
 
-/*
-&hdmi_cec {
+&hdmi {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_hdmi_cec>;
-	status = "okay";
-};
-
-&hdmi_core {
-	ipu_id = <0>;
-	disp_id = <0>;
-	status = "okay";
-};
-
-&hdmi_video {
-	fsl,phy_reg_vlev = <0x0294>;
-	fsl,phy_reg_cksymtx = <0x800d>;
-	status = "okay";
-};
-
-&hdmi_audio {
-	status = "okay";
-};
-*/
-
-&dcic1 {
-	dcic_id = <0>;
-	dcic_mux = "dcic-hdmi";
-	status = "okay";
-};
-
-&dcic2 {
-	dcic_id = <1>;
-	dcic_mux = "dcic-lvds1";
+	ddc-i2c-bus = <&i2c2>;
 	status = "okay";
 };
 
