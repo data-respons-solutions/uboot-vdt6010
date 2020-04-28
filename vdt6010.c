@@ -41,13 +41,13 @@ static int enable_regulator(const char* name)
 
 	int r = regulator_get_by_platname(name, &reg);
 	if (r) {
-		printf("%s: failed finding: %s [%d]: %s\n", __func__, name, -r, errno_str(-r));
+		printf("%s: failed finding: %s [%d]: %s\n", __func__, name, r, errno_str(r));
 		return r;
 	}
 
 	r = regulator_set_enable(reg, 1);
 	if (r) {
-		printf("%s: failed enabling: %s [%d]: %s\n", __func__, name, -r, errno_str(-r));
+		printf("%s: failed enabling: %s [%d]: %s\n", __func__, name, r, errno_str(r));
 		return r;
 	}
 
@@ -58,13 +58,13 @@ static int request_gpio(struct gpio_desc* desc, const char* name, const char* la
 {
 	int r = dm_gpio_lookup_name(name, desc);
 	if (r) {
-		printf("%s: failed finding: %s [%d]: %s\n", __func__, name, -r, errno_str(-r));
+		printf("%s: failed finding: %s [%d]: %s\n", __func__, name, r, errno_str(r));
 		return r;
 	}
 
 	r = dm_gpio_request(desc, label);
 	if (r) {
-		printf("%s: failed requesting: %s [%d]: %s\n", __func__, name, -r, errno_str(-r));
+		printf("%s: failed requesting: %s [%d]: %s\n", __func__, name, r, errno_str(r));
 		return r;
 	}
 
@@ -75,13 +75,13 @@ static int set_gpio(struct gpio_desc* desc, const char* name, int value)
 {
 	int r = dm_gpio_set_dir_flags(desc, GPIOD_IS_OUT);
 	if (r) {
-		printf("%s: failed setting output: %s [%d]: %s\n", __func__, name, -r, errno_str(-r));
+		printf("%s: failed setting output: %s [%d]: %s\n", __func__, name, r, errno_str(r));
 		return r;
 	}
 
 	r = dm_gpio_set_value(desc, value);
 	if (r) {
-		printf("%s: failed setting value: %s->%d [%d]: %s\n", __func__, name, value, -r, errno_str(-r));
+		printf("%s: failed setting value: %s->%d [%d]: %s\n", __func__, name, value, r, errno_str(r));
 		return r;
 	}
 
@@ -296,18 +296,18 @@ int power_init_board(void)
 
 	r = pmic_get("pfuze100", &dev);
 	if (r) {
-		printf("pmic: pfuze100: not found [%d]: %s\n", -r, errno_str(-r));
+		printf("pmic: pfuze100: not found [%d]: %s\n", r, errno_str(r));
 		return r;
 	}
 
 	dev_id = pmic_reg_read(dev, PFUZE100_DEVICEID);
 	if (dev_id < 0) {
-		printf("pmic: pfuze100: dev_id [%d]: %s\n", -dev_id, errno_str(-dev_id));
+		printf("pmic: pfuze100: dev_id [%d]: %s\n", dev_id, errno_str(dev_id));
 		return dev_id;
 	}
 	rev_id = pmic_reg_read(dev, PFUZE100_REVID);
 	if (dev_id < 0) {
-		printf("pmic: pfuze100: rev_id [%d]: %s\n", -rev_id, errno_str(-rev_id));
+		printf("pmic: pfuze100: rev_id [%d]: %s\n", rev_id, errno_str(rev_id));
 		return rev_id;
 	}
 	printf("pmic: pfuze100: dev_id: 0x%04x: rev_id: 0x%04x\n", dev_id, rev_id);
@@ -318,7 +318,7 @@ int power_init_board(void)
 		printf("pmic: pfuze100: SW1ABVOL: 1425 mV\n");
 	}
 	else {
-		printf("pmic: pfuze100: SW1ABVOL [%d]: %s\n", -r, errno_str(-r));
+		printf("pmic: pfuze100: SW1ABVOL [%d]: %s\n", r, errno_str(r));
 		return r;
 	}
 
@@ -328,7 +328,7 @@ int power_init_board(void)
 		printf("pmic: pfuze100: SW1CVOL: 1425 mV\n");
 	}
 	else {
-		printf("pmic: pfuze100: SW1CVOL [%d]: %s\n", -r, errno_str(-r));
+		printf("pmic: pfuze100: SW1CVOL [%d]: %s\n", r, errno_str(r));
 		return r;
 	}
 
@@ -338,7 +338,7 @@ int power_init_board(void)
 		printf("pmic: pfuze100: SW3AVOL: 1350 mV\n");
 	}
 	else {
-		printf("pmic: pfuze100: SW3AVOL [%d]: %s\n", -r, errno_str(-r));
+		printf("pmic: pfuze100: SW3AVOL [%d]: %s\n", r, errno_str(r));
 		return r;
 	}
 	r = pmic_reg_write(dev, PFUZE100_SW3BVOL, SW1x_1_350V);
@@ -347,7 +347,7 @@ int power_init_board(void)
 
 	}
 	else {
-		printf("pmic: pfuze100: SW3BVOL [%d]: %s\n", -r, errno_str(-r));
+		printf("pmic: pfuze100: SW3BVOL [%d]: %s\n", r, errno_str(r));
 		return r;
 	}
 
