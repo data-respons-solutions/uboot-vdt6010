@@ -29,8 +29,6 @@
 	};
 	
 	aliases {
-		mxcfb0 = &mxcfb1;
-		mxcfb1 = &mxcfb2;
 		rtc0 = &s35390a_rtc;
 		rtc1 = &snvs_rtc;
 	};
@@ -105,7 +103,7 @@
 		
 	};
 	
-	backlight {
+	backlight_lvds: backlight-lvds {
 		compatible = "pwm-backlight";
 		pwms = <&pwm1 0 1000000>;
         brightness-levels = <	0 1 2 3 4 5 6 7 8 9 10 15 20 25 
@@ -215,38 +213,31 @@
 		};        
 	};	
 		
-	mxcfb1: fb@0 {
-		compatible = "fsl,mxc_sdc_fb";
-		disp_dev = "ldb";
-		interface_pix_fmt = "RGB24";
-		default_bpp = <32>;
-		int_clk = <0>;
-		late_init = <0>;
-		status = "okay";
-	};
-	
-	mxcfb2: fb@1 {
-		compatible = "fsl,mxc_sdc_fb";
-		disp_dev = "hdmi";
-		interface_pix_fmt = "RGB24";
-		mode_str ="1920x1080M@60";
-		default_bpp = <24>;
-		int_clk = <0>;
-		late_init = <0>;
-		status = "disabled";
-	};
-	
-	v4l2_out {
-		compatible = "fsl,mxc_v4l2_output";
-		status = "okay";
-	};
+	panel {
+		compatible = "Ampire,AM-1280800NTZQW-T10H", "panel-lvds";
+		data-mapping = "jeida-24";
+		backlight = <&backlight_lvds>;
 
-/*
-	sound-hdmi {
-		compatible = "fsl,imx6q-audio-hdmi",
-			     "fsl,imx-audio-hdmi";
-		model = "imx-audio-hdmi";
-		hdmi-controller = <&hdmi_audio>;
+		width-mm = <136>;
+		height-mm = <217>;
+
+		panel-timing {
+				clock-frequency = <71100000>;
+				hactive = <1280>;
+				vactive = <800>;
+				hback-porch = <50>;
+				hfront-porch = <50>;
+				vback-porch = <10>;
+				vfront-porch = <10>;
+				hsync-len = <60>;
+				vsync-len = <3>;
+		};
+			
+		port {
+			panel_in: endpoint {
+				remote-endpoint = <&lvds0_out>;
+			};
+		};
 	};
 */
 };
@@ -824,35 +815,17 @@
 
 &ldb {
 	status = "okay";
-	
-	lvds-channel@0 {
-		crtc = "ipu1-di0";
-		status = "disabled";
-	};
 
 	lvds-channel@1 {
 		fsl,data-mapping = "spwg";
 		fsl,data-width = <24>;
-		primary;
-		crtc = "ipu1-di0";
 		status = "okay";
-		
-		display-timings {
-			native-mode = <&timing0>;
-			timing0: AM-1280800NTZQW-T10H {
-					/*
-					* Tv = hactive + hback-porch + hfront-porch + hsync-len
-					* Th = vactive + vback-porch + vfront-porch + vsync-len
-					*/
-					clock-frequency = <71100000>;
-					hactive = <1280>;
-					vactive = <800>;
-					hback-porch = <50>;
-					hfront-porch = <50>;
-					vback-porch = <10>;
-					vfront-porch = <10>;
-					hsync-len = <60>;
-					vsync-len = <3>;
+
+		port@4 {
+			reg = <4>;
+
+			lvds0_out: endpoint {
+				remote-endpoint = <&panel_in>;
 			};
 		};
 	};
