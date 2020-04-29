@@ -456,11 +456,6 @@
 	status = "okay";
 };
 
-&ssi2 {
-	fsl,mode = "i2s-slave";
-	status = "okay";
-};
-
 &pmic {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_pmic>;
