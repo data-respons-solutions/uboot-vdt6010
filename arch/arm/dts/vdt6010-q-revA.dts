@@ -329,6 +329,10 @@
 	pmic: pfuze100@08 {
 		compatible = "fsl,pfuze100";
 		reg = <0x08>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_pmic>;
+		interrupt-parent = <&gpio7>;
+		interrupts = <13 8>;
 
 		regulators {
 			sw1a_reg: sw1ab {
@@ -454,13 +458,6 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_pwm1>;
 	status = "okay";
-};
-
-&pmic {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_pmic>;
-	interrupt-parent = <&gpio7>;
-	interrupts = <13 8>;
 };
 
 &pcie {
