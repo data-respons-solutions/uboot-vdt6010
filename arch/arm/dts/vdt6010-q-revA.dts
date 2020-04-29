@@ -562,10 +562,6 @@
 	status = "disabled";
 };
 
-&snvs_poweroff {
-	status = "okay";
-};
-
 &ldb {
 	status = "okay";
 
