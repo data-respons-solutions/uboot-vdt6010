@@ -554,11 +554,6 @@
 	status = "okay";
 };
 
-&gpc {
-	fsl,ldo-bypass = <0>;
-	fsl,wdog-reset = <1>;
-};
-
 &wdog1 {
 	status = "okay";
 };
