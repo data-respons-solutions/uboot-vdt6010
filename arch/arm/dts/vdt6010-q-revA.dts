@@ -267,13 +267,13 @@
 				reg = <0x30000 0xF0000>;
 			};
 		
-			factory_a@0x120000 {
-				label = "factory_a";
+			system_a@0x120000 {
+				label = "system_a";
 				reg = <0x120000 0x10000>;
 			};
 			
-			factory_b@0x130000 {
-				label = "factory_b";
+			system_b@0x130000 {
+				label = "system_b";
 				reg = <0x130000 0x10000>;
 			};
 				
