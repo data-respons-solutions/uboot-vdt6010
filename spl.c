@@ -114,6 +114,35 @@ static const struct mx6_ddr3_cfg mem_ddr_NT5CC256M16EP_EK = {
 	/*.SRT = 1,*/
 };
 
+static const struct mx6_mmdc_calibration mx6dq_calib_V73CBG08168RFPK13 = {
+	.p0_mpwldectrl0 =  0x002A0027,
+	.p0_mpwldectrl1 =  0x00380030,
+	.p1_mpwldectrl0 =  0x001D002E,
+	.p1_mpwldectrl1 =  0x001A002E,
+	.p0_mpdgctrl0 =  0x03340348,
+	.p0_mpdgctrl1 =  0x03340328,
+	.p1_mpdgctrl0 =  0x032C033C,
+	.p1_mpdgctrl1 =  0x03280274,
+	.p0_mprddlctl =  0x483C4240,
+	.p1_mprddlctl =  0x403E384C,
+	.p0_mpwrdlctl =  0x34343E3A,
+	.p1_mpwrdlctl =  0x422C4238,
+};
+
+static const struct mx6_ddr3_cfg mem_ddr_V73CBG08168RFPK13 = {
+	.mem_speed = 1600,
+	.density = 8,
+	.width = 16,
+	.banks = 8,
+	.rowaddr = 16,
+	.coladdr = 10,
+	.pagesz = 2,
+	.trcd = 1100,
+	.trcmin = 3900,
+	.trasmin = 2800,
+	/*.SRT = 1,*/
+};
+
 static struct mx6_ddr_sysinfo sysinfo = {
 	/* width of data bus:0=16,1=32,2=64 */
 	.dsize = 2,
@@ -154,8 +183,14 @@ static void ccgr_init(void)
 
 static void spl_dram_init(void)
 {
-	mx6dq_dram_iocfg(64, &mx6dq_ddr_ioregs, &mx6dq_grp_ioregs);
-	mx6_dram_cfg(&sysinfo, &mx6dq_calib_NT5CC256M16EP_EK, &mem_ddr_NT5CC256M16EP_EK);
+	if (is_cpu_type(MXC_CPU_MX6Q)) {
+		mx6dq_dram_iocfg(64, &mx6dq_ddr_ioregs, &mx6dq_grp_ioregs);
+		mx6_dram_cfg(&sysinfo, &mx6dq_calib_V73CBG08168RFPK13, &mem_ddr_V73CBG08168RFPK13);
+	}
+	else {
+		mx6dq_dram_iocfg(64, &mx6dq_ddr_ioregs, &mx6dq_grp_ioregs);
+		mx6_dram_cfg(&sysinfo, &mx6dq_calib_NT5CC256M16EP_EK, &mem_ddr_NT5CC256M16EP_EK);
+	}
 }
 
 int board_early_init_f(void)
