@@ -60,7 +60,6 @@
 /* environment */
 #define CONFIG_LOADADDR			0x12000000
 #define CONFIG_SYS_LOAD_ADDR	CONFIG_LOADADDR
-#define CONFIG_ENV_SIZE			0x10000
 #define CONFIG_SYS_MALLOC_LEN	(40 * SZ_1M)
 
 /* uboot shell */
