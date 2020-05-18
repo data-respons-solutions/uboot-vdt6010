@@ -294,7 +294,7 @@ int power_init_board(void)
 	int dev_id = 0;
 	int rev_id = 0;
 
-	r = pmic_get("pfuze100", &dev);
+	r = pmic_get("pfuze100@08", &dev);
 	if (r) {
 		printf("pmic: pfuze100: not found [%d]: %s\n", r, errno_str(r));
 		return r;

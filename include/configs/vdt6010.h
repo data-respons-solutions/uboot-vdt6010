@@ -38,9 +38,6 @@
 #undef CONFIG_DM_SPI_FLASH
 #undef CONFIG_SPI_FLASH_MTD
 
-/* offset of u-boot binary on SPI NOR */
-#define CONFIG_SYS_SPI_U_BOOT_OFFS	0x30000
-
 /* Define console UART until migrate to DM */
 #define CONFIG_MXC_UART_BASE	UART5_BASE
 #endif
