@@ -22,7 +22,7 @@
 	
 	chosen {
 		stdout-path = "serial4:115200n8";
-		bootargs = "loglevel=6";
+		bootargs = "loglevel=6 rdinit=/linuxrc";
 	};
 	
 	aliases {
