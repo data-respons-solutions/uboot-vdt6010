@@ -10,18 +10,22 @@
 #include <asm/arch/imx-regs.h>
 #include <asm/mach-imx/spi.h>
 #include <asm/mach-imx/boot_mode.h>
+#include <asm/mach-imx/iomux-v3.h>
 #include <asm/arch/crm_regs.h>
 #include <asm/io.h>
 #include <asm/arch/sys_proto.h>
+#include <asm/gpio.h>
 #include <version.h>
 #include <watchdog.h>
+#include <asm/arch/mx6-pins.h>
 #include <asm/arch/mx6-ddr.h>
 #include <spl.h>
 #include <asm/mach-imx/hab.h>
-#include "vdt6010_pins.h"
-#include "vdt6010_gpio.h"
+#include "../common/include/mx6_common_defs.h"
 
 DECLARE_GLOBAL_DATA_PTR;
+
+#define SPI_NOR_CS		IMX_GPIO_NR(5, 29)
 
 int board_spi_cs_gpio(unsigned bus, unsigned cs)
 {
@@ -221,6 +225,10 @@ static const char* hw_string[8] = {
 	"H",
 };
 
+#define HW_SETTING_0	IMX_GPIO_NR(4, 21)
+#define HW_SETTING_1	IMX_GPIO_NR(4, 22)
+#define HW_SETTING_2	IMX_GPIO_NR(4, 23)
+
 static int get_version(void)
 {
 	return (((!gpio_get_value(HW_SETTING_0)) << 2) |
@@ -248,6 +256,25 @@ static void spl_dram_init(void)
 		}
 	}
 }
+
+static const iomux_v3_cfg_t const uart5_pads[] = {
+	IOMUX_PADS(PAD_CSI0_DAT14__UART5_TX_DATA	| MUX_PAD_CTRL(UART_PAD_CTRL)),
+	IOMUX_PADS(PAD_CSI0_DAT15__UART5_RX_DATA	| MUX_PAD_CTRL(UART_PAD_CTRL)),
+};
+
+static const iomux_v3_cfg_t const spi_nor_pads[] = {
+	IOMUX_PADS(PAD_CSI0_DAT8__ECSPI2_SCLK | MUX_PAD_CTRL(SPI_PAD_CTRL)),
+	IOMUX_PADS(PAD_CSI0_DAT9__ECSPI2_MOSI | MUX_PAD_CTRL(SPI_PAD_CTRL)),
+	IOMUX_PADS(PAD_CSI0_DAT10__ECSPI2_MISO | MUX_PAD_CTRL(SPI_PAD_CTRL)),
+	IOMUX_PADS(PAD_CSI0_DAT11__GPIO5_IO29 | MUX_PAD_CTRL(SPI_PAD_CTRL)), // cs
+};
+
+
+static const iomux_v3_cfg_t const hw_rev_pads [] = {
+	IOMUX_PADS(PAD_DISP0_DAT0__GPIO4_IO21 | MUX_PAD_CTRL(WEAK_PULLUP)), // HW_Setting_0
+	IOMUX_PADS(PAD_DISP0_DAT1__GPIO4_IO22 | MUX_PAD_CTRL(WEAK_PULLUP)), // HW_Setting_1
+	IOMUX_PADS(PAD_DISP0_DAT2__GPIO4_IO23 | MUX_PAD_CTRL(WEAK_PULLUP)), // HW_Setting_2
+};
 
 int board_early_init_f(void)
 {

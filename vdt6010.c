@@ -12,6 +12,7 @@
 #include <asm/arch/mxc_hdmi.h>
 #include <asm/arch/crm_regs.h>
 #include <asm/mach-imx/video.h>
+#include <asm/arch/mx6-pins.h>
 #include <asm/io.h>
 #include <asm/gpio.h>
 #include <asm/arch/sys_proto.h>
@@ -20,10 +21,7 @@
 #include <power/pmic.h>
 #include <power/pfuze100_pmic.h>
 #include <power/regulator.h>
-
-#include "vdt6010_pins.h"
-#include "vdt6010_gpio.h"
-
+#include "../common/include/mx6_common_defs.h"
 DECLARE_GLOBAL_DATA_PTR;
 
 #define BACKLIGHT_FREQ_HZ 1000
@@ -105,6 +103,10 @@ static void do_enable_hdmi(struct display_info_t const *dev)
 	disable_lvds(dev);
 	imx_enable_hdmi_phy();
 }
+
+static const iomux_v3_cfg_t const pwm_pads[] = {
+	IOMUX_PADS(PAD_SD1_DAT3__PWM1_OUT | MUX_PAD_CTRL(OUT_LOW_PAD_CTRL)),
+};
 
 static void enable_lvds(struct display_info_t const *dev)
 {
