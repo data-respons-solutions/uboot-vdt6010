@@ -23,4 +23,10 @@ static iomux_v3_cfg_t const pwm_pads[] = {
 	IOMUX_PADS(PAD_SD1_DAT3__PWM1_OUT | MUX_PAD_CTRL(OUT_LOW_PAD_CTRL)),
 };
 
+static iomux_v3_cfg_t const hw_rev_pads [] = {
+	IOMUX_PADS(PAD_DISP0_DAT0__GPIO4_IO21 | MUX_PAD_CTRL(WEAK_PULLUP)), // HW_Setting_0
+	IOMUX_PADS(PAD_DISP0_DAT1__GPIO4_IO22 | MUX_PAD_CTRL(WEAK_PULLUP)), // HW_Setting_1
+	IOMUX_PADS(PAD_DISP0_DAT2__GPIO4_IO23 | MUX_PAD_CTRL(WEAK_PULLUP)), // HW_Setting_2
+};
+
 #endif

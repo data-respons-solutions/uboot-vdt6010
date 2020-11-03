@@ -40,49 +40,49 @@ int board_spi_cs_gpio(unsigned bus, unsigned cs)
 #define MX6DQ_INPUT_DIFFERENTIAL 0x00020000
 
 static const struct mx6dq_iomux_ddr_regs mx6dq_ddr_ioregs = {
-	.dram_sdclk_0 = MX6DQ_INPUT_DIFFERENTIAL | MX6DQ_DS_40_OHM,
-	.dram_sdclk_1 = MX6DQ_INPUT_DIFFERENTIAL | MX6DQ_DS_40_OHM,
-	.dram_cas = MX6DQ_INPUT_DIFFERENTIAL | MX6DQ_DS_40_OHM,
-	.dram_ras = MX6DQ_INPUT_DIFFERENTIAL | MX6DQ_DS_40_OHM,
-	.dram_reset = MX6DQ_INPUT_DIFFERENTIAL | MX6DQ_DS_40_OHM,
+	.dram_sdclk_0 = MX6DQ_INPUT_DIFFERENTIAL | MX6DQ_DS_48_OHM,
+	.dram_sdclk_1 = MX6DQ_INPUT_DIFFERENTIAL | MX6DQ_DS_48_OHM,
+	.dram_cas = MX6DQ_INPUT_DIFFERENTIAL | MX6DQ_DS_48_OHM,
+	.dram_ras = MX6DQ_INPUT_DIFFERENTIAL | MX6DQ_DS_48_OHM,
+	.dram_reset = MX6DQ_INPUT_DIFFERENTIAL | MX6DQ_DS_48_OHM,
 	.dram_sdba2 = MX6DQ_DS_GRP,
 	.dram_sdcke0 = 0x00003000, // reserved bits
 	.dram_sdcke1 = 0x00003000, // reserved bits
-	.dram_sdodt0 = 0x00003000 | MX6DQ_DS_40_OHM,
-	.dram_sdodt1 = 0x00003000 | MX6DQ_DS_40_OHM,
-	.dram_sdqs0 = MX6DQ_DS_40_OHM,
-	.dram_sdqs1 = MX6DQ_DS_40_OHM,
-	.dram_sdqs2 = MX6DQ_DS_40_OHM,
-	.dram_sdqs3 = MX6DQ_DS_40_OHM,
-	.dram_sdqs4 = MX6DQ_DS_40_OHM,
-	.dram_sdqs5 = MX6DQ_DS_40_OHM,
-	.dram_sdqs6 = MX6DQ_DS_40_OHM,
-	.dram_sdqs7 = MX6DQ_DS_40_OHM,
-	.dram_dqm0 = MX6DQ_INPUT_DIFFERENTIAL | MX6DQ_DS_40_OHM,
-	.dram_dqm1 = MX6DQ_INPUT_DIFFERENTIAL | MX6DQ_DS_40_OHM,
-	.dram_dqm2 = MX6DQ_INPUT_DIFFERENTIAL | MX6DQ_DS_40_OHM,
-	.dram_dqm3 = MX6DQ_INPUT_DIFFERENTIAL | MX6DQ_DS_40_OHM,
-	.dram_dqm4 = MX6DQ_INPUT_DIFFERENTIAL | MX6DQ_DS_40_OHM,
-	.dram_dqm5 = MX6DQ_INPUT_DIFFERENTIAL | MX6DQ_DS_40_OHM,
-	.dram_dqm6 = MX6DQ_INPUT_DIFFERENTIAL | MX6DQ_DS_40_OHM,
-	.dram_dqm7 = MX6DQ_INPUT_DIFFERENTIAL | MX6DQ_DS_40_OHM,
+	.dram_sdodt0 = 0x00003000 | MX6DQ_DS_48_OHM,
+	.dram_sdodt1 = 0x00003000 | MX6DQ_DS_48_OHM,
+	.dram_sdqs0 = MX6DQ_DS_48_OHM,
+	.dram_sdqs1 = MX6DQ_DS_48_OHM,
+	.dram_sdqs2 = MX6DQ_DS_48_OHM,
+	.dram_sdqs3 = MX6DQ_DS_48_OHM,
+	.dram_sdqs4 = MX6DQ_DS_48_OHM,
+	.dram_sdqs5 = MX6DQ_DS_48_OHM,
+	.dram_sdqs6 = MX6DQ_DS_48_OHM,
+	.dram_sdqs7 = MX6DQ_DS_48_OHM,
+	.dram_dqm0 = MX6DQ_INPUT_DIFFERENTIAL | MX6DQ_DS_48_OHM,
+	.dram_dqm1 = MX6DQ_INPUT_DIFFERENTIAL | MX6DQ_DS_48_OHM,
+	.dram_dqm2 = MX6DQ_INPUT_DIFFERENTIAL | MX6DQ_DS_48_OHM,
+	.dram_dqm3 = MX6DQ_INPUT_DIFFERENTIAL | MX6DQ_DS_48_OHM,
+	.dram_dqm4 = MX6DQ_INPUT_DIFFERENTIAL | MX6DQ_DS_48_OHM,
+	.dram_dqm5 = MX6DQ_INPUT_DIFFERENTIAL | MX6DQ_DS_48_OHM,
+	.dram_dqm6 = MX6DQ_INPUT_DIFFERENTIAL | MX6DQ_DS_48_OHM,
+	.dram_dqm7 = MX6DQ_INPUT_DIFFERENTIAL | MX6DQ_DS_48_OHM,
 };
 
 static const struct mx6dq_iomux_grp_regs mx6dq_grp_ioregs = {
 	.grp_ddr_type = MX6DQ_DDR_TYPE_DD3,
 	.grp_ddrpke = MX6DQ_DDRPKE_DISABLED,
-	.grp_addds = MX6DQ_DS_40_OHM,
-	.grp_ctlds = MX6DQ_DS_40_OHM,
+	.grp_addds = MX6DQ_DS_48_OHM,
+	.grp_ctlds = MX6DQ_DS_48_OHM,
 	.grp_ddrmode_ctl = MX6DQ_INPUT_DIFFERENTIAL,
 	.grp_ddrmode = MX6DQ_INPUT_DIFFERENTIAL,
-	.grp_b0ds = MX6DQ_DS_40_OHM,
-	.grp_b1ds = MX6DQ_DS_40_OHM,
-	.grp_b2ds = MX6DQ_DS_40_OHM,
-	.grp_b3ds = MX6DQ_DS_40_OHM,
-	.grp_b4ds = MX6DQ_DS_40_OHM,
-	.grp_b5ds = MX6DQ_DS_40_OHM,
-	.grp_b6ds = MX6DQ_DS_40_OHM,
-	.grp_b7ds = MX6DQ_DS_40_OHM,
+	.grp_b0ds = MX6DQ_DS_48_OHM,
+	.grp_b1ds = MX6DQ_DS_48_OHM,
+	.grp_b2ds = MX6DQ_DS_48_OHM,
+	.grp_b3ds = MX6DQ_DS_48_OHM,
+	.grp_b4ds = MX6DQ_DS_48_OHM,
+	.grp_b5ds = MX6DQ_DS_48_OHM,
+	.grp_b6ds = MX6DQ_DS_48_OHM,
+	.grp_b7ds = MX6DQ_DS_48_OHM,
 };
 
 static const struct mx6_mmdc_calibration mx6dq_calib_NT5CC256M16EP_EK = {
@@ -143,6 +143,35 @@ static const struct mx6_ddr3_cfg mem_ddr_V73CBG08168RFPK13 = {
 	/*.SRT = 1,*/
 };
 
+static const struct mx6_mmdc_calibration mx6dq_calib_MT41K512M16HA_107 = {
+	.p0_mpwldectrl0 =  0x00260028,
+	.p0_mpwldectrl1 =  0x0030002A,
+	.p1_mpwldectrl0 =  0x00190029,
+	.p1_mpwldectrl1 =  0x0017002B,
+	.p0_mpdgctrl0 =  0x03240334,
+	.p0_mpdgctrl1 =  0x03200318,
+	.p1_mpdgctrl0 =  0x03280340,
+	.p1_mpdgctrl1 =  0x03200268,
+	.p0_mprddlctl =  0x44364040,
+	.p1_mprddlctl =  0x423C384A,
+	.p0_mpwrdlctl =  0x363C3C36,
+	.p1_mpwrdlctl =  0x4232463E,
+};
+
+static const struct mx6_ddr3_cfg mem_ddr_MT41K512M16HA_107 = {
+	.mem_speed = 1600,
+	.density = 8,
+	.width = 16,
+	.banks = 8,
+	.rowaddr = 16,
+	.coladdr = 10,
+	.pagesz = 2,
+	.trcd = 1375,
+	.trcmin = 4875,
+	.trasmin = 3500,
+	.SRT = 1,
+};
+
 static struct mx6_ddr_sysinfo sysinfo = {
 	/* width of data bus:0=16,1=32,2=64 */
 	.dsize = 2,
@@ -181,15 +210,42 @@ static void ccgr_init(void)
 	writel(0x00000339, &ccm->CCGR6);
 }
 
+static const char* hw_string[8] = {
+	"A",
+	"B",
+	"C",
+	"D",
+	"E",
+	"F",
+	"G",
+	"H",
+};
+
+static int get_version(void)
+{
+	return (((!gpio_get_value(HW_SETTING_0)) << 2) |
+			((!gpio_get_value(HW_SETTING_1)) << 1) |
+			(!gpio_get_value(HW_SETTING_2)) ) & 7;
+}
+
 static void spl_dram_init(void)
 {
-	if (is_cpu_type(MXC_CPU_MX6Q)) {
+	if (get_version() == 3) { // Rev D
+		printf("DDR3L: Micron MT41K512M16HA-107\n");
 		mx6dq_dram_iocfg(64, &mx6dq_ddr_ioregs, &mx6dq_grp_ioregs);
-		mx6_dram_cfg(&sysinfo, &mx6dq_calib_V73CBG08168RFPK13, &mem_ddr_V73CBG08168RFPK13);
+		mx6_dram_cfg(&sysinfo, &mx6dq_calib_MT41K512M16HA_107, &mem_ddr_MT41K512M16HA_107);
 	}
-	else {
-		mx6dq_dram_iocfg(64, &mx6dq_ddr_ioregs, &mx6dq_grp_ioregs);
-		mx6_dram_cfg(&sysinfo, &mx6dq_calib_NT5CC256M16EP_EK, &mem_ddr_NT5CC256M16EP_EK);
+	else { // Rev A -> Before hw_rev gpio implemented
+		if (is_cpu_type(MXC_CPU_MX6Q)) {
+			printf("DDR3L: Promos V73CBG08168RFPK13\n");
+			mx6dq_dram_iocfg(64, &mx6dq_ddr_ioregs, &mx6dq_grp_ioregs);
+			mx6_dram_cfg(&sysinfo, &mx6dq_calib_V73CBG08168RFPK13, &mem_ddr_V73CBG08168RFPK13);
+		}
+		else {
+			printf("DDR3L: Nanya NT5CC256M16EP-EK\n");
+			mx6dq_dram_iocfg(64, &mx6dq_ddr_ioregs, &mx6dq_grp_ioregs);
+			mx6_dram_cfg(&sysinfo, &mx6dq_calib_NT5CC256M16EP_EK, &mem_ddr_NT5CC256M16EP_EK);
+		}
 	}
 }
 
@@ -197,6 +253,7 @@ int board_early_init_f(void)
 {
 	SETUP_IOMUX_PADS(spi_nor_pads);
 	SETUP_IOMUX_PADS(uart5_pads);
+	SETUP_IOMUX_PADS(hw_rev_pads);
 
 	return 0;
 }
@@ -219,6 +276,8 @@ void board_init_f(ulong dummy)
 
 	// Setup console
 	preloader_console_init();
+
+	printf("version: %s\n", hw_string[get_version()]);
 
 	// Set DRAM config
 	spl_dram_init();
