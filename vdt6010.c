@@ -104,7 +104,7 @@ static void do_enable_hdmi(struct display_info_t const *dev)
 	imx_enable_hdmi_phy();
 }
 
-static const iomux_v3_cfg_t const pwm_pads[] = {
+static const iomux_v3_cfg_t pwm_pads[] = {
 	IOMUX_PADS(PAD_SD1_DAT3__PWM1_OUT | MUX_PAD_CTRL(OUT_LOW_PAD_CTRL)),
 };
 
