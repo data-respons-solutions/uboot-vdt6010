@@ -238,12 +238,10 @@ static int get_version(void)
 
 static void spl_dram_init(void)
 {
-	if (get_version() == 3) { // Rev D
-		printf("DDR3L: Micron MT41K512M16HA-107\n");
-		mx6dq_dram_iocfg(64, &mx6dq_ddr_ioregs, &mx6dq_grp_ioregs);
-		mx6_dram_cfg(&sysinfo, &mx6dq_calib_MT41K512M16HA_107, &mem_ddr_MT41K512M16HA_107);
-	}
-	else { // Rev A -> Before hw_rev gpio implemented
+	switch (get_version()) {
+	case 0:
+	default:
+		// Rev A -> Before hw_rev gpio implemented
 		if (is_cpu_type(MXC_CPU_MX6Q)) {
 			printf("DDR3L: Promos V73CBG08168RFPK13\n");
 			mx6dq_dram_iocfg(64, &mx6dq_ddr_ioregs, &mx6dq_grp_ioregs);
@@ -254,6 +252,22 @@ static void spl_dram_init(void)
 			mx6dq_dram_iocfg(64, &mx6dq_ddr_ioregs, &mx6dq_grp_ioregs);
 			mx6_dram_cfg(&sysinfo, &mx6dq_calib_NT5CC256M16EP_EK, &mem_ddr_NT5CC256M16EP_EK);
 		}
+		break;
+	case 2: // Rev C
+		printf("DDR3L: Nanya NT5CC256M16EP-EK\n");
+		mx6dq_dram_iocfg(64, &mx6dq_ddr_ioregs, &mx6dq_grp_ioregs);
+		mx6_dram_cfg(&sysinfo, &mx6dq_calib_NT5CC256M16EP_EK, &mem_ddr_NT5CC256M16EP_EK);
+		break;
+	case 3: // Rev D
+		printf("DDR3L: Promos V73CBG08168RFPK13\n");
+		mx6dq_dram_iocfg(64, &mx6dq_ddr_ioregs, &mx6dq_grp_ioregs);
+		mx6_dram_cfg(&sysinfo, &mx6dq_calib_V73CBG08168RFPK13, &mem_ddr_V73CBG08168RFPK13);
+		break;
+	case 4: // Rev E
+		printf("DDR3L: Micron MT41K512M16HA-107\n");
+		mx6dq_dram_iocfg(64, &mx6dq_ddr_ioregs, &mx6dq_grp_ioregs);
+		mx6_dram_cfg(&sysinfo, &mx6dq_calib_MT41K512M16HA_107, &mem_ddr_MT41K512M16HA_107);
+		break;
 	}
 }
 
